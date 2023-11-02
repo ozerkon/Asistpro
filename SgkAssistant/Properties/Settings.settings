@@ -1,0 +1,249 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SgkAssistant.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="discid" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="sgscEnc" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="lastUserName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="dbType" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="mschostL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">P8IU78ky6kb7vPyXRKvEgQ==</Value>
+    </Setting>
+    <Setting Name="mscuidL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">I3HC09eFH0jF8KkaDbhLXA==</Value>
+    </Setting>
+    <Setting Name="mscupL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PEIRl27RhvVcfrru0f84xA==</Value>
+    </Setting>
+    <Setting Name="mscdbL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">35f5k7K+lgfPzp0pFOkmHA==</Value>
+    </Setting>
+    <Setting Name="mscprtL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">izrolWego1szTT3iQ0OpTA==</Value>
+    </Setting>
+    <Setting Name="solverKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)">K82964397288957</Value>
+    </Setting>
+    <Setting Name="mschostR" Type="System.String" Scope="User">
+      <Value Profile="(Default)">+rjzHzKMjV9Wh07YyS3osQ==</Value>
+    </Setting>
+    <Setting Name="mscuidR" Type="System.String" Scope="User">
+      <Value Profile="(Default)">aAXHjzruFVJ0G95xxMPwKw==</Value>
+    </Setting>
+    <Setting Name="mscupR" Type="System.String" Scope="User">
+      <Value Profile="(Default)">hHPZSNcjVkRgcb5v7vrQqSHJD2YwuX3BJYoiUq3KiDA=</Value>
+    </Setting>
+    <Setting Name="mscdbR" Type="System.String" Scope="User">
+      <Value Profile="(Default)">aAXHjzruFVJ0G95xxMPwKw==</Value>
+    </Setting>
+    <Setting Name="mscprtR" Type="System.String" Scope="User">
+      <Value Profile="(Default)">borXcW0ZPl8UN3BHvmvToQ==</Value>
+    </Setting>
+    <Setting Name="cmpCheck" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Gv*6BF37hgPB586esD?hv?_MF&amp;ra@Ps6zzvpCefwxWGQr$DS-bQLZdQpW$8zvxGN</Value>
+    </Setting>
+    <Setting Name="browser" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="disposeDriver" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="passPhrase" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9Pp_A2GN5^fcTQ?*$8^tUGxyPra3WUa7</Value>
+    </Setting>
+    <Setting Name="cmmColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">PaleTurquoise</Value>
+    </Setting>
+    <Setting Name="cmColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">PaleGreen</Value>
+    </Setting>
+    <Setting Name="pdColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">PaleVioletRed</Value>
+    </Setting>
+    <Setting Name="tblPD" Type="System.String" Scope="User">
+      <Value Profile="(Default)">/html/body/div/table/tbody/tr[4]/td[2]/table[2]/tbody/tr[3]/td/table/tbody/tr[2]/td[2]/table</Value>
+    </Setting>
+    <Setting Name="tblET" Type="System.String" Scope="User">
+      <Value Profile="(Default)">/html/body/div/table[1]/tbody/tr[4]/td[2]/table[2]/tbody/tr/td/table/tbody/tr[2]/td[2]/table</Value>
+    </Setting>
+    <Setting Name="tblME" Type="System.String" Scope="User">
+      <Value Profile="(Default)">/html/body/div/table[1]/tbody/tr[4]/td[2]/table[3]/tbody/tr[2]/td[2]/table</Value>
+    </Setting>
+    <Setting Name="autoCaptcha" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="hideBrowser" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="rgvFontName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Segoe UI</Value>
+    </Setting>
+    <Setting Name="rgvFontSize" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">8.25</Value>
+    </Setting>
+    <Setting Name="rgvTitleFontSize" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="rgvTitleFontStyle" Type="System.Drawing.FontStyle" Scope="User">
+      <Value Profile="(Default)">Bold</Value>
+    </Setting>
+    <Setting Name="rgvTitleFontColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">DarkBlue</Value>
+    </Setting>
+    <Setting Name="tblICR" Type="System.String" Scope="User">
+      <Value Profile="(Default)">/html/body/div/table/tbody/tr[4]/td[2]/table[2]/tbody/tr/td/table/tbody/tr[2]/td[2]/table/tbody/tr/td/table</Value>
+    </Setting>
+    <Setting Name="tbl6661" Type="System.String" Scope="User">
+      <Value Profile="(Default)">//*[@id='contentContainer']/div/table/tbody/tr[2]/td/table/tbody/tr[2]/td[2]/div/table[2]</Value>
+    </Setting>
+    <Setting Name="rgvTitleFontName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Segoe UI</Value>
+    </Setting>
+    <Setting Name="cid" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="cid2" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="sp" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="cp" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="gun" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="gp" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="gs" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="scd1" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="scd2" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="scd3" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="scd4" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="scd5" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="sira" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="wait" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+    <Setting Name="tblIGL" Type="System.String" Scope="User">
+      <Value Profile="(Default)">its</Value>
+    </Setting>
+    <Setting Name="tblHl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">gradienttable</Value>
+    </Setting>
+    <Setting Name="cGunColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">255, 192, 192</Value>
+    </Setting>
+    <Setting Name="gGunColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">192, 255, 192</Value>
+    </Setting>
+    <Setting Name="hlPdfBasePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">SgkAsistan\PdfTmp</Value>
+    </Setting>
+    <Setting Name="theme" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Desert</Value>
+    </Setting>
+    <Setting Name="solverType" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="rgvFontColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Black</Value>
+    </Setting>
+    <Setting Name="rgvFontStyle" Type="System.Drawing.FontStyle" Scope="User">
+      <Value Profile="(Default)">Regular</Value>
+    </Setting>
+    <Setting Name="closeAllBrowsers" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="solverKeyIT" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="hlCalisanColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">White</Value>
+    </Setting>
+    <Setting Name="iglGirisColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">192, 255, 192</Value>
+    </Setting>
+    <Setting Name="iglCikisColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">255, 192, 192</Value>
+    </Setting>
+    <Setting Name="updateFrequency" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="lastUpdateCheckDate" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tabOrderEvizite" Type="Models.Common.TabOrder" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tabOrderLinks" Type="Models.Common.TabOrder" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tabOrderHesapDurumu" Type="Models.Common.TabOrder" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tabOrderHizmetListe" Type="Models.Common.TabOrder" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tabOrderIgic" Type="Models.Common.TabOrder" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tabOrderLastName" Type="Models.Common.TabOrder" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tabOrderSettings" Type="Models.Common.TabOrder" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tabOrderTesvik" Type="Models.Common.TabOrder" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tabOrderYillik" Type="Models.Common.TabOrder" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="leavePeriodOddColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">AliceBlue</Value>
+    </Setting>
+    <Setting Name="leavePeriodEvenColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">PeachPuff</Value>
+    </Setting>
+    <Setting Name="publicHolidays" Type="System.Collections.Generic.List&lt;Models.Common.PublicHolidays&gt;" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="lastLoginDate" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="FirstTimeRunningThisVersion" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="leavePersonalOddColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">LavenderBlush</Value>
+    </Setting>
+    <Setting Name="leavePersonalEvenColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">PowderBlue</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

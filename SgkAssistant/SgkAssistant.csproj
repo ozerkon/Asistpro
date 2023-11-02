@@ -1,0 +1,1012 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8ADE74B9-1403-40D5-9E7C-A9E3282AE00A}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SgkAssistant</RootNamespace>
+    <AssemblyName>Asistpro</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <PublishUrl>\\176.53.40.210\sgkasistan\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Unc</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <SupportUrl>http://destek.sinerjia.net/</SupportUrl>
+    <ErrorReportUrl>http://error.sinerjia.net/</ErrorReportUrl>
+    <TargetCulture>tr-TR</TargetCulture>
+    <ProductName>SGK Asistan</ProductName>
+    <PublisherName>SinerjiA</PublisherName>
+    <ApplicationRevision>6</ApplicationRevision>
+    <ApplicationVersion>1.1.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>asistpro.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>A0F939E413579806874E13DA5C7D59765AB81F06</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>SgkAssistant_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AngleSharp, Version=1.0.4.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
+      <HintPath>..\packages\AngleSharp.1.0.4\lib\net472\AngleSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=1.4.2.13, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.1.4.2\lib\netstandard2.0\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.7.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Win32.Registry, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Win32.Registry.5.0.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="SeleniumExtras.WaitHelpers, Version=3.11.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetSeleniumExtras.WaitHelpers.3.11.0\lib\net45\SeleniumExtras.WaitHelpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.AccessControl, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.AccessControl.6.0.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Principal.Windows.5.0.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encoding.CodePages, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encoding.CodePages.7.0.0\lib\net462\System.Text.Encoding.CodePages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.7.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=7.0.0.3, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.7.0.3\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Telerik.WinControls, Version=2021.2.615.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
+      <HintPath>..\lib\RCWF\2021.2.615.40\Telerik.WinControls.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Telerik.WinControls.GridView, Version=2021.2.615.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL" />
+    <Reference Include="Telerik.WinControls.RichTextEditor, Version=2021.2.615.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL" />
+    <Reference Include="Telerik.WinControls.Themes.Aqua, Version=2021.2.615.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL" />
+    <Reference Include="Telerik.WinControls.Themes.Breeze, Version=2021.2.615.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL" />
+    <Reference Include="Telerik.WinControls.Themes.Desert, Version=2021.2.615.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL" />
+    <Reference Include="Telerik.WinControls.UI, Version=2021.2.615.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
+      <HintPath>..\lib\RCWF\2021.2.615.40\Telerik.WinControls.UI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="TelerikCommon, Version=2021.2.615.40, Culture=neutral, PublicKeyToken=5bb2a467cbec794e, processorArchitecture=MSIL">
+      <HintPath>..\lib\RCWF\2021.2.615.40\TelerikCommon.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WebDriver, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selenium.WebDriver.4.11.0\lib\net48\WebDriver.dll</HintPath>
+    </Reference>
+    <Reference Include="WebDriver.Support, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selenium.Support.4.11.0\lib\net48\WebDriver.Support.dll</HintPath>
+    </Reference>
+    <Reference Include="WebDriverManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebDriverManager.2.17.0\lib\net462\WebDriverManager.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FormLoader.cs" />
+    <Compile Include="Forms\Common\fLicence.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Common\fLicence.designer.cs">
+      <DependentUpon>fLicence.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Common\fAbout.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Common\fAbout.designer.cs">
+      <DependentUpon>fAbout.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Common\fBaslangic.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Common\fBaslangic.Designer.cs">
+      <DependentUpon>fBaslangic.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Common\fCaptcha.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Common\fCaptcha.Designer.cs">
+      <DependentUpon>fCaptcha.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Common\fLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Common\fLogin.designer.cs">
+      <DependentUpon>fLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Common\fReportDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Common\fReportDetails.designer.cs">
+      <DependentUpon>fReportDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Common\fSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Common\fSettings.designer.cs">
+      <DependentUpon>fSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Common\fSplash.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Common\fSplash.designer.cs">
+      <DependentUpon>fSplash.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Common\fHlp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Common\fHlp.designer.cs">
+      <DependentUpon>fHlp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fCompany.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fCompany.designer.cs">
+      <DependentUpon>fCompany.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fCompanyCenter.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fCompanyCenter.Designer.cs">
+      <DependentUpon>fCompanyCenter.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fLeavesAdd.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fLeavesAdd.Designer.cs">
+      <DependentUpon>fLeavesAdd.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fPersonalAdd.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fPersonalAdd.designer.cs">
+      <DependentUpon>fPersonalAdd.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fCompanyAdd.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fCompanyAdd.designer.cs">
+      <DependentUpon>fCompanyAdd.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fLeaveList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fLeaveList.designer.cs">
+      <DependentUpon>fLeaveList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fPersonalList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fPersonalList.designer.cs">
+      <DependentUpon>fPersonalList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fCompanyList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fCompanyList.designer.cs">
+      <DependentUpon>fCompanyList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fConfirmDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fConfirmDetails.designer.cs">
+      <DependentUpon>fConfirmDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fHlReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fHlReport.designer.cs">
+      <DependentUpon>fHlReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fIncentiveReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fIncentiveReport.designer.cs">
+      <DependentUpon>fIncentiveReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fLastNamesReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fLastNamesReport.designer.cs">
+      <DependentUpon>fLastNamesReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Common\fPackage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Common\fPackage.designer.cs">
+      <DependentUpon>fPackage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Common\fSinerjiA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Common\fSinerjiA.designer.cs">
+      <DependentUpon>fSinerjiA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fPersonal.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fPersonal.Designer.cs">
+      <DependentUpon>fPersonal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fLeave.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fLeave.Designer.cs">
+      <DependentUpon>fLeave.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fSolverHelp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fSolverHelp.designer.cs">
+      <DependentUpon>fSolverHelp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fTimeOut.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fTimeOut.Designer.cs">
+      <DependentUpon>fTimeOut.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fUnconfirmDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fUnconfirmDetails.Designer.cs">
+      <DependentUpon>fUnconfirmDetails.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fUser.designer.cs">
+      <DependentUpon>fUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Defs\fUserList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Defs\fUserList.designer.cs">
+      <DependentUpon>fUserList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Common\fWarningAuthority.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Common\fWarningAuthority.designer.cs">
+      <DependentUpon>fWarningAuthority.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\CheckForUpdate.cs" />
+    <Compile Include="Helpers\DateTimeHelper.cs" />
+    <Compile Include="Helpers\DesignHelper.cs" />
+    <Compile Include="Helpers\DragAndDropRadGrid.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Helpers\Encrypt.cs" />
+    <Compile Include="Helpers\ImageMap.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Helpers\IndicatedComboBoxColumn\IndicatedComboBoxCellElement.cs" />
+    <Compile Include="Helpers\IndicatedComboBoxColumn\IndicatedComboBoxColumn.cs" />
+    <Compile Include="Helpers\IndicatedDateTimeColumn\IndicatedDateTimeCellElement.cs" />
+    <Compile Include="Helpers\IndicatedDateTimeColumn\IndicatedDateTimeColumn.cs" />
+    <Compile Include="Helpers\Localization.cs" />
+    <Compile Include="Helpers\NtpClient.cs" />
+    <Compile Include="Helpers\PackageHelper.cs" />
+    <Compile Include="Helpers\PersonalService.cs" />
+    <Compile Include="Helpers\PrintablePanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Helpers\RgvHelpers.cs" />
+    <Compile Include="Helpers\SgkAutomations.cs" />
+    <Compile Include="Helpers\WinHelpers.cs" />
+    <Compile Include="IncentiveOperations\IncentiveOps.cs" />
+    <Compile Include="IOC.cs" />
+    <Compile Include="LinkOperations\LinkOps.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
+    <EmbeddedResource Include="Forms\Common\fLicence.resx">
+      <DependentUpon>fLicence.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Common\fAbout.resx">
+      <DependentUpon>fAbout.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Common\fBaslangic.resx">
+      <DependentUpon>fBaslangic.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Common\fBaslangic.tr-TR.resx">
+      <DependentUpon>fBaslangic.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Common\fCaptcha.resx">
+      <DependentUpon>fCaptcha.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Common\fLogin.resx">
+      <DependentUpon>fLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Common\fReportDetails.resx">
+      <DependentUpon>fReportDetails.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Common\fSettings.resx">
+      <DependentUpon>fSettings.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Common\fSplash.resx">
+      <DependentUpon>fSplash.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Common\fHlp.resx">
+      <DependentUpon>fHlp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fCompany.resx">
+      <DependentUpon>fCompany.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fCompanyCenter.resx">
+      <DependentUpon>fCompanyCenter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fLeavesAdd.resx">
+      <DependentUpon>fLeavesAdd.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fPersonalAdd.resx">
+      <DependentUpon>fPersonalAdd.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fCompanyAdd.resx">
+      <DependentUpon>fCompanyAdd.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fLeaveList.resx">
+      <DependentUpon>fLeaveList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fPersonalList.resx">
+      <DependentUpon>fPersonalList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fCompanyList.resx">
+      <DependentUpon>fCompanyList.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fConfirmDetails.resx">
+      <DependentUpon>fConfirmDetails.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fHlReport.resx">
+      <DependentUpon>fHlReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fIncentiveReport.resx">
+      <DependentUpon>fIncentiveReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fLastNamesReport.resx">
+      <DependentUpon>fLastNamesReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Common\fPackage.resx">
+      <DependentUpon>fPackage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Common\fSinerjiA.resx">
+      <DependentUpon>fSinerjiA.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fPersonal.resx">
+      <DependentUpon>fPersonal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fLeave.resx">
+      <DependentUpon>fLeave.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fSolverHelp.resx">
+      <DependentUpon>fSolverHelp.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fTimeOut.resx">
+      <DependentUpon>fTimeOut.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fUnconfirmDetails.resx">
+      <DependentUpon>fUnconfirmDetails.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fUser.resx">
+      <DependentUpon>fUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Defs\fUserList.resx">
+      <DependentUpon>fUserList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Common\fWarningAuthority.resx">
+      <DependentUpon>fWarningAuthority.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Helpers\ImageMap.resx">
+      <DependentUpon>ImageMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="CleanBrowser.bat" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="SgkAssistant_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <!--sirinie -->
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\about.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\about-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\addPerson.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\approval.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\being-sick.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cancel.fw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cancel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cancel-24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cancel-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\captcha.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\captcha1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\checkmark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chrome.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chrome-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chrome-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\circle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\companies-add-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\companies-add-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\company.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\company-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\company-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\company-add-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\company-add-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\compare-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\database-view.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\database-view-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\database-view-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\debt-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\debt-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\debt-642.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\debts.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\delete-bin-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\delete-bin-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\detailsview.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\download.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\evizite.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\exit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\export-pdf.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\fee-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\fee-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\file.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\firefox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\firefox-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\firefox-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\help.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\hide.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\hospital.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\iconsview.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\info-squared-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\info-squared-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\internet.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\internet-explorer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\link.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\listview.fw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\listview.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\login-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\microsoft-edge.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\microsoft-excel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\microsoft-excel-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\microsoft-excel-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\minus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\open-in-browser.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\paste.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\paste-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\paste-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pdf.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\print.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\print-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\print-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\process-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\refresh-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\refresh-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\report.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\report-card-50.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sa.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\search-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\search-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\settings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\settings-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\settings-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sgk.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\shutdown.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sort.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sort-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sort-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sort-down-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sort-down-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sort-up-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sort-up-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\splash.fw.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\splash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\start.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\start-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\start-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\stethoscope.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\turkish-lira-16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\turkish-lira-161.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\undo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\update.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\user.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\users-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\users-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\users-add-64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\users-add-641.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Varlık 13%404x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\wizard.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\wizard1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\xls.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\xlsx.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataServices\DataServices.csproj">
+      <Project>{ECFAD5E1-2C6D-4FDB-95E1-4DB0BD06B195}</Project>
+      <Name>DataServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Models\Models.csproj">
+      <Project>{74d95240-a73e-47b6-9be0-b57f5f8a2f03}</Project>
+      <Name>Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SGKServices\SGKServices.csproj">
+      <Project>{f5145700-57e3-47d4-8e0a-07d5eadd4046}</Project>
+      <Name>SGKServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WebDriverX\WebDriverX.csproj">
+      <Project>{EE8A47ED-9A8C-4203-B447-D1EC3D7A9068}</Project>
+      <Name>WebDriverX</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="asistanMavi.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="asistansimge.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="asistpro.ico" />
+    <None Include="Resources\export-pdf-50.png" />
+    <None Include="Resources\PersonalSearch.fw.png" />
+    <None Include="Resources\question24.png" />
+    <None Include="Resources\info-squared-96.png" />
+    <None Include="Resources\wizard.fw.png" />
+    <None Include="Resources\key.png" />
+    <None Include="Resources\splash2.png" />
+    <None Include="Resources\captcha3.png" />
+    <None Include="Resources\about2.png" />
+    <None Include="Resources\asistpro24.png" />
+    <None Include="Resources\asistpro.png" />
+    <None Include="Resources\splash1.png" />
+    <None Include="Resources\wizard2.png" />
+    <None Include="Resources\captcha2.png" />
+    <None Include="Resources\about1.png" />
+    <None Include="Resources\cancel-44.png" />
+    <None Include="Resources\export-xls-44.png" />
+    <None Include="Resources\exit1.png" />
+    <None Include="Resources\aside-44.png" />
+    <None Include="Resources\question-mark-96.png" />
+    <None Include="Resources\calendar-64.png" />
+    <None Include="Resources\select-all-64.png" />
+    <None Include="Resources\excel-32.png" />
+    <None Include="Resources\import-from-excel-32.png" />
+    <None Include="Resources\leave-delete32.png" />
+    <None Include="Resources\leave-edit32.png" />
+    <None Include="Resources\leave-add32.png" />
+    <None Include="Resources\personalDelet-32.png" />
+    <None Include="Resources\personalEdit-32.png" />
+    <None Include="Resources\personalAdd-321.png" />
+    <None Include="Resources\personalAdd-32.png" />
+    <None Include="Resources\download-pdf-50.png" />
+    <None Include="Resources\approved-50.png" />
+    <None Include="Resources\unapproved-50.png" />
+    <None Include="Resources\separate-document-44.png" />
+    <None Include="Resources\separate-document-64.png" />
+    <None Include="Resources\copy-24.png" />
+    <None Include="Resources\copy-16.png" />
+    <None Include="Resources\tesvik.gif" />
+    <None Include="Resources\hesapdurumu.gif" />
+    <None Include="Resources\hizmetlistesipersonel.gif" />
+    <None Include="Resources\hizmetlistesi.gif" />
+    <None Include="Resources\lastname.gif" />
+    <None Include="Resources\igic.gif" />
+    <None Include="Resources\soyad.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.8 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties ShouldAddDPIScalingManifest="True" />
+    </VisualStudio>
+  </ProjectExtensions>
+  <Import Project="..\packages\Selenium.WebDriver.4.11.0\build\Selenium.WebDriver.targets" Condition="Exists('..\packages\Selenium.WebDriver.4.11.0\build\Selenium.WebDriver.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Selenium.WebDriver.4.11.0\build\Selenium.WebDriver.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Selenium.WebDriver.4.11.0\build\Selenium.WebDriver.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
