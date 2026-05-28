@@ -337,27 +337,45 @@ namespace SgkAssistant.LinkOperations
         }
         public void SetWebBrowserProcess()
         {
+            // ---- FİREFOX İÇİN KESİN ÇÖZÜM (PID YÖNTEMİ) ----
+            if (Surucu.Driver is OpenQA.Selenium.IHasCapabilities hasCaps && hasCaps.Capabilities.HasCapability("moz:processID"))
+            {
+                int firefoxPid = Convert.ToInt32(hasCaps.Capabilities.GetCapability("moz:processID"));
+                Process = System.Diagnostics.Process.GetProcessById(firefoxPid);
+                return; // Firefox ise işlemi bulduk, metottan çıkabiliriz.
+            }
+
+            // ---- CHROME İÇİN BAŞLIK DEĞİŞTİRME YÖNTEMİ ----
             int tryCount = 0;
-            // store the old browser window title and give it a unique title.
-            string oldTitle = Surucu.Driver.Title;
+            string oldTitle = Surucu.Driver.Title ?? "";
             string newTitle = $"{Guid.NewGuid():n}";
 
             IJavaScriptExecutor js = (IJavaScriptExecutor)Surucu.Driver;
-            js.ExecuteScript($"document.title = '{newTitle}'");
 
-            // find the process that contains the unique title.
-            while (Process == null)
+            try
             {
-                Process = Process.GetProcesses().FirstOrDefault(p => p.MainWindowTitle.Contains(newTitle));
-                if (tryCount < 100)
+                js.ExecuteScript($"document.title = '{newTitle}'");
+            }
+            catch (Exception)
+            {
+                return;
+            }
+
+            while (Process == null && tryCount < 100)
+            {
+                Process = System.Diagnostics.Process.GetProcesses().FirstOrDefault(p => p.MainWindowTitle.Contains(newTitle));
+                if (Process == null)
                 {
                     tryCount++;
                     Thread.Sleep(100);
                 }
             }
 
-            // reset the browser window title.
-            js.ExecuteScript($"document.title = '{oldTitle}'");
+            try
+            {
+                js.ExecuteScript($"document.title = '{oldTitle}'");
+            }
+            catch { }
         }
         public string GetElementText(IWebElement element)
         {

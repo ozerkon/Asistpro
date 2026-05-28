@@ -3704,194 +3704,303 @@ namespace SgkAssistant.Forms.Common
             GlobalVars.CancelProcess = false;
             report = string.Empty;
             IOC.SgkLinksService.CaptchaCode = null;
-            report = String.Empty; listeLastNames.Clear(); 
-            btnSoyadUpdateReport.Visibility = ElementVisibility.Collapsed;
-            btnSoyadUpdateReport.Enabled = true;
-            GlobalVars.ProcessReport += $"<html><ul>";
-            lblReport.Text = GlobalVars.ProcessReport;
+            listeLastNames.Clear();
             acError = false;
+
+            // 1. UI İlk Hazırlık İşlemleri (Invoke ile Ana Thread üzerinde çalıştırılıyor)
+            Invoke((Action)(() =>
+            {
+                btnSoyadUpdateReport.Visibility = ElementVisibility.Collapsed;
+                btnSoyadUpdateReport.Enabled = true;
+                GlobalVars.ProcessReport += $"<html><ul>";
+                lblReport.Text = GlobalVars.ProcessReport;
+            }));
+
             if (Surucu.Driver == null || !IOC.LinkOps.IsBrowserOpen())
                 Surucu.Driver = IOC.WinHelpers.GetWebDriver(Settings.Default.hideBrowser, out msg);
 
-            IOC.LinkOps.CmdUrlVurl = LinkGlobals.LstLinks.Where(x => x.Id == 53).Select(x => new CmdUrlVurl { Cmd = x.Cmd,Url = x.Url, Vurl = x.Vurl }).FirstOrDefault();
-            IOC.SgkLinksService.Command = IOC.LinkOps.CmdUrlVurl.Cmd;
-            IOC.SgkLinksService.Url = IOC.LinkOps.CmdUrlVurl.Url;
-            IOC.SgkLinksService.Vurl = IOC.LinkOps.CmdUrlVurl.Vurl;
+            IOC.LinkOps.CmdUrlVurl = LinkGlobals.LstLinks.Where(x => x.Id == 53).Select(x => new CmdUrlVurl { Cmd = x.Cmd, Url = x.Url, Vurl = x.Vurl }).FirstOrDefault();
+            IOC.SgkLinksService.Command = IOC.LinkOps.CmdUrlVurl?.Cmd;
+            IOC.SgkLinksService.Url = IOC.LinkOps.CmdUrlVurl?.Url;
+            IOC.SgkLinksService.Vurl = IOC.LinkOps.CmdUrlVurl?.Vurl;
             IOC.SgkLinksService.SetSgkLoginCredentials(login);
-            //string url = IOC.LinkOps.CmdUrlVurl.Cmd.Substring(4, IOC.LinkOps.CmdUrlVurl.Cmd.IndexOf('\r') - 4);
-            IOC.SgkLinksService.Command = IOC.LinkOps.CmdUrlVurl.Cmd;
-            
+            IOC.SgkLinksService.Command = IOC.LinkOps.CmdUrlVurl?.Cmd;
+
             try
             {
                 WebDriverWait wait = IOC.SgkLinksService.GetWait();
-                
-                login = GlobalVars.Companies.Where(x => x.Id == Convert.ToInt32(rgvCompanyList.CurrentRow.Cells[0].Value)).FirstOrDefault();
+
+                // 2. UI Kontrolünden Seçili Şirketi Güvenle Alıyoruz
+                int currentCompanyId = 0;
+                Invoke((Action)(() =>
+                {
+                    if (rgvCompanyList.CurrentRow != null && rgvCompanyList.CurrentRow.Cells[0].Value != null)
+                    {
+                        currentCompanyId = Convert.ToInt32(rgvCompanyList.CurrentRow.Cells[0].Value);
+                    }
+                }));
+
+                login = GlobalVars.Companies.Where(x => x.Id == currentCompanyId).FirstOrDefault();
+                if (login == null) return;
+
                 IOC.SgkLinksService.SetSgkLoginCredentials(login);
                 IOC.SgkLinksService.CompanyName = login.CompanyName;
-               
+
                 IOC.LinkOps.VisitLink(login, IOC.SgkLinksService.Url, ref acError, out msg, ref lblReportSoyad);
 
-                if (msg.Contains("iptal")) { e.Cancel = true; return ; }
+                if (msg.Contains("iptal")) { e.Cancel = true; return; }
                 else if (msg == "continue" || msg.Contains("Hata"))
                 {
-                    GlobalVars.ProcessReport += $"<li><strong><span style=\"color: red; font-size: 10pt\">{login.CompanyName} için oturum açılamadı! {IOC.SgkLinksService.Message}</span></strong></li></ul></html><ul>";
-                    lblReport.Text = GlobalVars.ProcessReport;
-                    lblMessage.Text = $"{IOC.SgkLinksService.CompanyName} için oturum açılamadı! {IOC.SgkLinksService.Message}";
+                    Invoke((Action)(() =>
+                    {
+                        GlobalVars.ProcessReport += $"<li><strong><span style=\"color: red; font-size: 10pt\">{login.CompanyName} için oturum açılamadı! {IOC.SgkLinksService.Message}</span></strong></li></ul></html><ul>";
+                        lblReport.Text = GlobalVars.ProcessReport;
+                        lblMessage.Text = $"{IOC.SgkLinksService.CompanyName} için oturum açılamadı! {IOC.SgkLinksService.Message}";
+                    }));
                     e.Cancel = true; return;
                 }
                 else if (msg == "continueGoAhead")
                 {
-                    GlobalVars.ProcessReport += $"<li><strong><span style=\"color: red; font-size: 10pt\">Oturum açıldıktan sonra devam edilemiyor. Hata: {IOC.SgkLinksService.Message}</span></strong></li></ul></html><ul>";
-                    lblReport.Text = GlobalVars.ProcessReport;
-                    lblMessage.Text = $"Oturum açıldıktan sonra devam edilemiyor. Hata: {IOC.SgkLinksService.Message}";
+                    Invoke((Action)(() =>
+                    {
+                        GlobalVars.ProcessReport += $"<li><strong><span style=\"color: red; font-size: 10pt\">Oturum açıldıktan sonra devam edilemiyor. Hata: {IOC.SgkLinksService.Message}</span></strong></li></ul></html><ul>";
+                        lblReport.Text = GlobalVars.ProcessReport;
+                        lblMessage.Text = $"Oturum açıldıktan sonra devam edilemiyor. Hata: {IOC.SgkLinksService.Message}";
+                    }));
                     e.Cancel = true; return;
                 }
 
+                if (bgwSoyad.CancellationPending) { e.Cancel = true; return; }
 
-                if (bgwSoyad.CancellationPending == true) { e.Cancel = true; return; }
-                for (int i = 0; i < rgvLastName.RowCount; i++)
+                // 3. UI Grid'deki TCKN verilerini güvenli bir listeye kopyalıyoruz (Cross-thread engelleme)
+                List<string> tcknList = new List<string>();
+                Invoke((Action)(() =>
                 {
-                    LastNames l = new LastNames() { Tcno = "x", Asf = "y", Asl = "z" };
-                    listeLastNames.Add(l);
-                }
-                lblReport.Text += "<li><strong><span style=\"font-size: 10pt\">Soyad güncelleme başlatılıyor</li>";
-                if (msg.Contains("Oturum başlatıldı"))
-                {
-                    int i = 0;
                     foreach (GridViewRowInfo row in rgvLastName.Rows)
                     {
-                        if (bgwSoyad.CancellationPending == true) { e.Cancel = true; return; }
-                        DetailsNameTc.Tcno = row.Cells[0].Value.ToString();
-                        lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">{DetailsNameTc.Tcno} için İşe Giriş Bildirgesi'nden Ad-Soyad sorgulanıyor</span></strong></li>";
+                        if (row.Cells[0].Value != null)
+                        {
+                            tcknList.Add(row.Cells[0].Value.ToString().Trim());
+                        }
+                    }
+                    lblReport.Text += "<li><strong><span style=\"font-size: 10pt\">Soyad güncelleme başlatılıyor</li>";
+                }));
+
+                // Belleğe aldığımız liste miktarı kadar lastnames şablonu oluşturuluyor
+                for (int idx = 0; idx < tcknList.Count; idx++)
+                {
+                    listeLastNames.Add(new LastNames() { Tcno = "x", Asf = "y", Asl = "z" });
+                }
+
+                if (msg.Contains("Oturum başlatıldı"))
+                {
+                    // --- BÖLÜM 1: Ad-Soyad Sorgulama Döngüsü ---
+                    for (int i = 0; i < tcknList.Count; i++)
+                    {
+                        if (bgwSoyad.CancellationPending) { e.Cancel = true; return; }
+
+                        string currentTc = tcknList[i];
+                        DetailsNameTc.Tcno = currentTc;
+
+                        Invoke((Action)(() =>
+                        {
+                            lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">{currentTc} için İşe Giriş Bildirgesi'nden Ad-Soyad sorgulanıyor</span></strong></li>";
+                        }));
+
                         soyadError = IOC.SgkLinksService.FillTextBox("x", "/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[6]/td/table/tbody/tr/td[4]/nobr/input[1]", "DetailsNameTC.tcno", out msg);
-                        if (!soyadError) { lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{DetailsNameTc.Tcno} için sorgulama yapılamadı. Kimlik no girilecek metin kutusuna erişilemedi.</span></strong></li>"; return; }
+
+                        if (!soyadError)
+                        {
+                            Invoke((Action)(() =>
+                            {
+                                lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{currentTc} için sorgulama yapılamadı. Kimlik no girilecek metin kutusuna erişilemedi.</span></strong></li>";
+                            }));
+                            return;
+                        }
+
                         IOC.SgkLinksService.Command = "clk t:x tv:/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[6]/td/table/tbody/tr/td[4]/nobr/input[2]\n\rlne\r\nlck Kimlik Numarası :";
+
                         if (IOC.SgkLinksService.GoAhead(out msg))
                         {
-                            if (bgwSoyad.CancellationPending == true) { e.Cancel = true; return; }
-                            IWebElement tcNo = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath("/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[8]/td")));
-                            IWebElement adSoyad = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath("/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[9]/td")));
+                            if (bgwSoyad.CancellationPending) { e.Cancel = true; return; }
+
+                            // Selenium 4 Standartlarına Uygun Bekleme (ExpectedConditions bağımlılığı olmadan)
+                            IWebElement tcNo = wait.Until(d => d.FindElement(By.XPath("/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[8]/td")));
+                            IWebElement adSoyad = wait.Until(d => d.FindElement(By.XPath("/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[9]/td")));
+
                             Thread.Sleep(500);
                             if (tcNo.Text != null && tcNo.Text.Contains("Kimlik Numarası :"))
                             {
-                                listeLastNames[i].Tcno = DetailsNameTc.Tcno;
+                                listeLastNames[i].Tcno = currentTc;
                                 listeLastNames[i].Asf = adSoyad.Text.Trim();
-                                lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">{DetailsNameTc.Tcno} : {adSoyad.Text.Trim()} eşleşmesi tespit edildi</span></strong></li>";
+
+                                Invoke((Action)(() =>
+                                {
+                                    lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">{currentTc} : {adSoyad.Text.Trim()} eşleşmesi tespit edildi</span></strong></li>";
+                                }));
                             }
                         }
                         else
                         {
                             hasErrorSoyad = true;
-                            listeLastNames[i].Tcno = DetailsNameTc.Tcno;
+                            listeLastNames[i].Tcno = currentTc;
                             if (msg.Contains("Geçersiz"))
                             {
                                 listeLastNames[i].Asf = "Geçersiz kimlik numarası";
-                                lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{DetailsNameTc.Tcno},için 'Geçersiz Kimlik Numarası' hatası alındı</span></strong></li>";
+                                Invoke((Action)(() =>
+                                {
+                                    lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{currentTc},için 'Geçersiz Kimlik Numarası' hatası alındı</span></strong></li>";
+                                }));
                             }
                             else if (msg == "HATA BİLDİRİM")
                             {
-                                lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{DetailsNameTc.Tcno},için 'Geçersiz Kimlik Numarası' hatası alındı</span></strong></li>";
+                                Invoke((Action)(() =>
+                                {
+                                    lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{currentTc},için 'Geçersiz Kimlik Numarası' hatası alındı</span></strong></li>";
+                                }));
                                 Surucu.Driver.Url = "https://uyg.sgk.gov.tr/SigortaliTescil/jsp/anamenu.jsp";
                             }
                         }
-                        i++;
                     }
-                    if (bgwSoyad.CancellationPending == true) { e.Cancel = true; return; }
+                    if (bgwSoyad.CancellationPending) { e.Cancel = true; return; }
                 }
-                lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">Soyadı Güncelleme sayfasına geçiliyor</span></strong></li>";
+
+                Invoke((Action)(() =>
+                {
+                    lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">Soyadı Güncelleme sayfasına geçiliyor</span></strong></li>";
+                }));
+
                 IOC.SgkLinksService.Command = "clk t:t tv:Ana Menü\n\rlck yeri Sicil No\n\rclk t:x tv:/html/body/center/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[2]/tbody/tr[22]/td/font/a\n\rlck m Sistemi verilerine g";
+
                 if (IOC.SgkLinksService.GoAhead(out msg))
                 {
-                    int j = 0;
-
-                    foreach (GridViewRowInfo row in rgvLastName.Rows)
+                    // --- BÖLÜM 2: Güncelleme İşlemi Döngüsü ---
+                    for (int j = 0; j < tcknList.Count; j++)
                     {
-                        if (bgwSoyad.CancellationPending == true) { e.Cancel = true; return; }
-                        lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">{DetailsNameTc.Tcno} için Soyadı Güncellemesi yapılıyor</span></strong></li>";
-                        DetailsNameTc.Tcno = row.Cells[0].Value.ToString();
+                        if (bgwSoyad.CancellationPending) { e.Cancel = true; return; }
+
+                        string currentTc = tcknList[j];
+                        DetailsNameTc.Tcno = currentTc;
+
+                        Invoke((Action)(() =>
+                        {
+                            lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">{currentTc} için Soyadı Güncellemesi yapılıyor</span></strong></li>";
+                        }));
+
                         IOC.SgkLinksService.FillTextBox("x", "/html/body/table[3]/tbody/tr/td/center/table/tbody/tr[2]/td[2]/form/span/table/tbody/tr[3]/td[1]/input", "DetailsNameTC.tcno", out msg);
                         IOC.SgkLinksService.Command = "clk t:x tv:/html/body/table[3]/tbody/tr/td/center/table/tbody/tr[2]/td[2]/form/span/table/tbody/tr[3]/td[2]/input\n\rlne\r\nlck Sigortalının kimlik bilgileri";
-                        if(IOC.SgkLinksService.GoAhead(out msg))
+
+                        if (IOC.SgkLinksService.GoAhead(out msg))
                         {
-                            j++; Thread.Sleep(300);
+                            Thread.Sleep(300);
                         }
                         else
                         {
-                            if (msg.Contains("Geçersiz"))
+                            Invoke((Action)(() =>
                             {
-                                lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{DetailsNameTc.Tcno},için 'Geçersiz Kimlik Numarası' hatası alındı</span></strong></li>";
-                            }
-                            else if (msg == "HATA BİLDİRİM")
-                            {
-                                lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{DetailsNameTc.Tcno},için 'Geçersiz Kimlik Numarası' hatası alındı</span></strong></li>";
-                                Surucu.Driver.Url = "https://uyg.sgk.gov.tr/SigortaliTescil/jsp/nufus.jsp";
-                            }
-                            else if (msg.Contains("4a kaydı"))
-                            {
-                                lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{DetailsNameTc.Tcno},için 'Sigortalının 4a kaydı bulunamamıştır' hatası alındı</span></strong></li>";
-                            }
+                                if (msg.Contains("Geçersiz"))
+                                {
+                                    lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{currentTc},için 'Geçersiz Kimlik Numarası' hatası alındı</span></strong></li>";
+                                }
+                                else if (msg == "HATA BİLDİRİM")
+                                {
+                                    lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{currentTc},için 'Geçersiz Kimlik Numarası' hatası alındı</span></strong></li>";
+                                    Surucu.Driver.Url = "https://uyg.sgk.gov.tr/SigortaliTescil/jsp/nufus.jsp";
+                                }
+                                else if (msg.Contains("4a kaydı"))
+                                {
+                                    lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{currentTc},için 'Sigortalının 4a kaydı bulunamamıştır' hatası alındı</span></strong></li>";
+                                }
+                            }));
                         }
                     }
-                    if (bgwSoyad.CancellationPending == true) { e.Cancel = true; return; }
+                    if (bgwSoyad.CancellationPending) { e.Cancel = true; return; }
                 }
-                lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">Teyit için tekrar İşe Giriş Bildirgesi sayfasına geçiliyor</span></strong></li>";
+
+                Invoke((Action)(() =>
+                {
+                    lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">Teyit için tekrar İşe Giriş Bildirgesi sayfasına geçiliyor</span></strong></li>";
+                }));
+
                 IOC.SgkLinksService.Command = "clk t:t tv:Ana Menü\n\rlck yeri Sicil No\n\rclk t:t tv:SİGORTALI İŞE GİRİŞ BİLDİRGESİ\n\rlck Sigortalının";
+
                 if (IOC.SgkLinksService.GoAhead(out msg))
                 {
-                    int k = 0;
-                    foreach (GridViewRowInfo row in rgvLastName.Rows)
+                    // --- BÖLÜM 3: Son Teyit (Doğrulama) Döngüsü ---
+                    for (int k = 0; k < tcknList.Count; k++)
                     {
-                        if (bgwSoyad.CancellationPending == true) { e.Cancel = true; return; }
-                        DetailsNameTc.Tcno = row.Cells[0].Value.ToString();
-                        lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">{DetailsNameTc.Tcno} için İşe Giriş Bildirgesi'nden Ad-Soyad sorgulanıyor</span></strong></li>";
+                        if (bgwSoyad.CancellationPending) { e.Cancel = true; return; }
+
+                        string currentTc = tcknList[k];
+                        DetailsNameTc.Tcno = currentTc;
+
+                        Invoke((Action)(() =>
+                        {
+                            lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">{currentTc} için İşe Giriş Bildirgesi'nden Ad-Soyad sorgulanıyor</span></strong></li>";
+                        }));
+
                         IOC.SgkLinksService.FillTextBox("x", "/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[6]/td/table/tbody/tr/td[4]/nobr/input[1]", "DetailsNameTC.tcno", out msg);
                         IOC.SgkLinksService.Command = "clk t:x tv:/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[6]/td/table/tbody/tr/td[4]/nobr/input[2]\n\rlne\n\rlck Kimlik Numarası :";
+
                         if (IOC.SgkLinksService.GoAhead(out msg))
                         {
-                            if (bgwSoyad.CancellationPending == true) { e.Cancel = true; return; }
-                            IWebElement tcNo = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath("/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[8]/td")));
-                            IWebElement adSoyad = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath("/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[9]/td")));
+                            if (bgwSoyad.CancellationPending) { e.Cancel = true; return; }
+
+                            IWebElement tcNo = wait.Until(d => d.FindElement(By.XPath("/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[8]/td")));
+                            IWebElement adSoyad = wait.Until(d => d.FindElement(By.XPath("/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[9]/td")));
+
                             Thread.Sleep(500);
                             if (tcNo.Text != null && tcNo.Text.Contains("Kimlik Numarası :"))
                             {
-                                //report += $"TCKN: {tcNo.Text.Substring(17,11)} Adı Soyadı: {adSoyad.Text}</span></strong></li>";
                                 listeLastNames[k].Asl = adSoyad.Text.Trim();
-                                lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">{DetailsNameTc.Tcno} : {adSoyad.Text.Trim()} eşleşmesi tespit edildi</span></strong></li>";
+                                Invoke((Action)(() =>
+                                {
+                                    lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">{currentTc} : {adSoyad.Text.Trim()} eşleşmesi tespit edildi</span></strong></li>";
+                                }));
                             }
                         }
                         else
                         {
                             hasErrorSoyad = true;
-                            if (msg.Contains("Geçersiz"))
+                            Invoke((Action)(() =>
                             {
-                                listeLastNames[k].Asl = "Geçersiz kimlik numarası";
-                                lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{DetailsNameTc.Tcno},için 'Geçersiz Kimlik Numarası' hatası alındı</span></strong></li>";
-                            }
-                            else if (msg == "HATA BİLDİRİM")
-                            {
-                                lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{DetailsNameTc.Tcno},için 'Geçersiz Kimlik Numarası' hatası alındı</span></strong></li>";
-                                Surucu.Driver.Url = "https://uyg.sgk.gov.tr/SigortaliTescil/jsp/anamenu.jsp";
-                            }
+                                if (msg.Contains("Geçersiz"))
+                                {
+                                    listeLastNames[k].Asl = "Geçersiz kimlik numarası";
+                                    lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{currentTc},için 'Geçersiz Kimlik Numarası' hatası alındı</span></strong></li>";
+                                }
+                                else if (msg == "HATA BİLDİRİM")
+                                {
+                                    lblReportSoyad.Text += $"<li><strong><span style=\"color: red; font-size: 10pt\">{currentTc},için 'Geçersiz Kimlik Numarası' hatası alındı</span></strong></li>";
+                                    Surucu.Driver.Url = "https://uyg.sgk.gov.tr/SigortaliTescil/jsp/anamenu.jsp";
+                                }
+                            }));
                         }
-                        k++;
                     }
-                    if (bgwSoyad.CancellationPending == true) { e.Cancel = true; return; }
+                    if (bgwSoyad.CancellationPending) { e.Cancel = true; return; }
                 }
             }
             catch (Exception ex)
             {
-                msg = ex.Message.ToString();
-                if (msg.Contains("arçacığı durdurul"))
+                msg = ex.Message;
+                Invoke((Action)(() =>
                 {
-                    lblMessage.Text = $"İşlem kullanıcı tarafından iptal edildi.";
-                }
-                else
-                {
-                    lblMessage.Text = $"Güncelleme başarısız! Hata: {msg}";
-                }
+                    if (msg.Contains("arçacığı durdurul"))
+                    {
+                        lblMessage.Text = $"İşlem kullanıcı tarafından iptal edildi.";
+                    }
+                    else
+                    {
+                        lblMessage.Text = $"Güncelleme başarısız! Hata: {msg}";
+                    }
+                }));
             }
+
             Thread.Sleep(3000);
-            btnSoyadUpdateReport.Visibility = ElementVisibility.Visible;
+            Invoke((Action)(() =>
+            {
+                btnSoyadUpdateReport.Visibility = ElementVisibility.Visible;
+            }));
         }
         private void BgwSoyadComplated(object sender, RunWorkerCompletedEventArgs e)
         {

@@ -128,129 +128,180 @@ namespace SgkAssistant.Forms.Defs
         {
             string msg = ""; isSgscOk = false;
             IOC.SgkLinksService.CaptchaCode = null;
-            GlobalVars.ProcessReport = $"<html><strong><span style=\"font-size: 10pt\"><ul>";
-            lblReport.Text = GlobalVars.ProcessReport;
-            lblReport.Text += $"<li>{texCompanyName.Text.Trim()} için SGK İşveren Sistemi'nden veri alma işlemi başladı</li>";
+
+            // UI elementlerinden güvenli şekilde değerleri alıyoruz (Cross-thread koruması)
+            string compName = "", compId = "", compId2 = "", sysPass = "", compPass = "";
+            Invoke((Action)(() =>
+            {
+                compName = texCompanyName.Text.Trim();
+                compId = texCompanyId.Text.Trim();
+                compId2 = texCompanyId2.Text.Trim();
+                sysPass = texSystemPassword.Text.Trim();
+                compPass = texCompanyPassword.Text.Trim();
+            }));
+
+            GlobalVars.ProcessReport = "<html><strong><span style=\"font-size: 10pt\"><ul>";
+
+            Invoke((Action)(() =>
+            {
+                lblReport.Text = GlobalVars.ProcessReport;
+                lblReport.Text += $"<li>{compName} için SGK İşveren Sistemi'nden veri alma işlemi başladı</li>";
+            }));
+
             isSgkInfoOk = true;
-            if (texCompanyName.Text.Trim().Length == 0) { SetTextBoxError(texCompanyName, null); isSgkInfoOk = false; }
-            if (texCompanyId.Text.Trim().Length == 0) { SetTextBoxError(texCompanyId, null); isSgkInfoOk = false; }
-            if (texCompanyId2.Text.Trim().Length == 0) { SetTextBoxError(texCompanyId2, null); isSgkInfoOk = false; }
-            if (texSystemPassword.Text.Trim().Length == 0) { SetTextBoxError(texSystemPassword, null); isSgkInfoOk = false; }
-            if (texCompanyPassword.Text.Trim().Length == 0) { SetTextBoxError(texCompanyPassword, null); isSgkInfoOk = false; }
+
+            // Alanların doluluk kontrollerini UI thread üzerinde güvenli tetikliyoruz
+            Invoke((Action)(() =>
+            {
+                if (compName.Length == 0) { SetTextBoxError(texCompanyName, null); isSgkInfoOk = false; }
+                if (compId.Length == 0) { SetTextBoxError(texCompanyId, null); isSgkInfoOk = false; }
+                if (compId2.Length == 0) { SetTextBoxError(texCompanyId2, null); isSgkInfoOk = false; }
+                if (sysPass.Length == 0) { SetTextBoxError(texSystemPassword, null); isSgkInfoOk = false; }
+                if (compPass.Length == 0) { SetTextBoxError(texCompanyPassword, null); isSgkInfoOk = false; }
+            }));
 
             if (!isSgkInfoOk)
             {
-                lblMessage.Text = "Lütfen SGK bilgilerini eksiksiz olarak doldurup tekrar deneyin";
+                Invoke((Action)(() => lblMessage.Text = "Lütfen SGK bilgilerini eksiksiz olarak doldurup tekrar deneyin"));
             }
-
             else
             {
-                isPageOpen = false; lblMessage.Text = string.Empty; Thread.Sleep(100);
+                isPageOpen = false;
+                Invoke((Action)(() => lblMessage.Text = string.Empty));
+                Thread.Sleep(100);
+
                 Company login = new Company()
                 {
-                    CompanyName = texCompanyName.Text.Trim(),
-                    CompanyId = texCompanyId.Text.Trim(),
-                    CompanyId2 = texCompanyId2.Text.Trim(),
-                    CompanyPassword = texCompanyPassword.Text.Trim(),
-                    SystemPassword = texSystemPassword.Text.Trim()
+                    CompanyName = compName,
+                    CompanyId = compId,
+                    CompanyId2 = compId2,
+                    CompanyPassword = compPass,
+                    SystemPassword = sysPass
                 };
+
                 IOC.SgkLinksService.SetSgkLoginCredentials(login);
                 try
                 {
-                    
                     int counter = 1;
                     while (LinkGlobals.LstLinks == null)
                     {
                         LinkGlobals.LstLinks = IOC.LinksDataService.GetAllLinks(out msg);
                         if (LinkGlobals.LstLinks != null) { break; }
                         counter++;
-                        if (counter == 3) { Invoke((Action)(() => {lblMessage.Text = "Veri tabanı hatası, lütfen daha sonra tekrar deneyin."; })); return; }
+                        if (counter == 3)
+                        {
+                            Invoke((Action)(() => lblMessage.Text = "Veri tabanı hatası, lütfen daha sonra tekrar deneyin."));
+                            return;
+                        }
                     }
+
                     IOC.SgkLinksService.Command = (from x in LinkGlobals.LstLinks where x.Id == 20 select x.Cmd).FirstOrDefault();
                     IOC.SgkLinksService.Url = "https://uyg.sgk.gov.tr/IsverenSistemi";
                     List<Company> companies = new List<Company>() { login };
+
                     IOC.LinkOps.StartProcessForLinks(companies, ref acError, out msg, ref lblReport);
-                    if (msg == "Oturum başlatıldı") 
+
+                    if (msg == "Oturum başlatıldı")
                     {
                         isPageOpen = true;
-                        if (bgw.CancellationPending == true) { e.Cancel = true; return; }
-                        WebDriverWait wait = new WebDriverWait(Surucu.Driver, TimeSpan.FromSeconds(LinkGlobals.MaxWait)); 
+                        if (bgw.CancellationPending) { e.Cancel = true; return; }
+                        WebDriverWait wait = new WebDriverWait(Surucu.Driver, TimeSpan.FromSeconds(LinkGlobals.MaxWait));
 
-                        texCompanyRegNo.Text = "";
+                        Invoke((Action)(() => texCompanyRegNo.Text = ""));
                         counter = 1;
-                        if (bgw.CancellationPending == true) { e.Cancel = true;  }
-                        lblReport.Text += $"<li>{texCompanyName.Text.Trim()} adlı firmanın bilgileri alınıyor</li>";
-                        while (texCompanyRegNo.Text.Trim() == "")
+                        if (bgw.CancellationPending) { e.Cancel = true; }
+
+                        Invoke((Action)(() => lblReport.Text += $"<li>{compName} adlı firmanın bilgileri alınıyor</li>"));
+
+                        // Döngü içi kontrolü lokal değişken üzerinden kontrol edilecek şekilde optimize edildi
+                        string currentRegNo = "";
+                        while (currentRegNo == "")
                         {
                             if (counter == 5) { e.Cancel = true; isSgscOk = false; return; }
-                            IWebElement table = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table")));
+
+                            // Native Selenium 4 Lambda bekleme yapıları entegre edildi
+                            IWebElement table = wait.Until(d => d.FindElement(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table")));
                             List<IWebElement> trs = table.FindElements(By.TagName("tr")).ToList();
 
-                            IWebElement weSgsc = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[1]/td[3]")));
-                            IWebElement weUnvan = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[3]")));
-                            if (bgw.CancellationPending == true) { e.Cancel = true;  }
+                            IWebElement weSgsc = wait.Until(d => d.FindElement(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[1]/td[3]")));
+                            IWebElement weUnvan = wait.Until(d => d.FindElement(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[3]")));
+
+                            if (bgw.CancellationPending) { e.Cancel = true; }
                             int rowCount = 7; string weAraciText = "";
                             if (trs.Count == 8)
                             {
                                 rowCount = 8;
-                                IWebElement weAraci = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[3]")));
+                                IWebElement weAraci = wait.Until(d => d.FindElement(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[3]")));
                                 weAraciText = weUnvan.Text.Trim();
                             }
 
-                            IWebElement weAdres = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 4}]/td[3]")));
-                            if (bgw.CancellationPending == true) { e.Cancel = true;  }
-                            IWebElement weBosgm = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 3}]/td[3]")));
-                            if (bgw.CancellationPending == true) { e.Cancel = true; }
-                            IWebElement weKka = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 2}]/td[3]")));
-                            if (bgw.CancellationPending == true) { e.Cancel = true; }
-                            IWebElement weKkc = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 1}]/td[3]")));
-                            if (bgw.CancellationPending == true) { e.Cancel = true; }
+                            IWebElement weAdres = wait.Until(d => d.FindElement(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 4}]/td[3]")));
+                            if (bgw.CancellationPending) { e.Cancel = true; }
+                            IWebElement weBosgm = wait.Until(d => d.FindElement(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 3}]/td[3]")));
+                            if (bgw.CancellationPending) { e.Cancel = true; }
+                            IWebElement weKka = wait.Until(d => d.FindElement(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 2}]/td[3]")));
+                            if (bgw.CancellationPending) { e.Cancel = true; }
+                            IWebElement weKkc = wait.Until(d => d.FindElement(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 1}]/td[3]")));
+                            if (bgw.CancellationPending) { e.Cancel = true; }
 
-                            texCompanyRegNo.Text = IOC.LinkOps.GetElementText(weSgsc).Trim().Replace(" ", "").Replace("-", "");// weSgsc.Text.Trim().Replace(" ", "").Replace("-", "");
-                            if (texCompanyRegNo.Text != "") { isSgscOk = true;  }
-                            texCompanyTitle.Text = IOC.LinkOps.GetElementText(weUnvan).Trim(); // weUnvan.Text.Trim();
-                            if (bgw.CancellationPending == true) { e.Cancel = true;  }
+                            string cleanedRegNo = IOC.LinkOps.GetElementText(weSgsc).Trim().Replace(" ", "").Replace("-", "");
+                            string cleanedTitle = IOC.LinkOps.GetElementText(weUnvan).Trim();
+                            string cleanedAdres = IOC.LinkOps.GetElementText(weAdres).Trim();
+                            string cleanedBosgm = IOC.LinkOps.GetElementText(weBosgm).Trim();
+                            string kkaText = IOC.LinkOps.GetElementText(weKka).Trim();
+                            string kkcText = IOC.LinkOps.GetElementText(weKkc).Trim();
+
+                            if (cleanedRegNo != "") { isSgscOk = true; }
                             if (rowCount == 8)
                             {
-                                texCompanyTitle.Text += $" (Aracı Unvan: {weAraciText}) ";
+                                cleanedTitle += $" (Aracı Unvan: {weAraciText}) ";
                             }
 
-                            texCompanyAdress.Text = IOC.LinkOps.GetElementText(weAdres).Trim(); //  weAdres.Text.Trim();
-                            texBOSGM.Text = IOC.LinkOps.GetElementText(weBosgm).Trim(); //  weBOSGM.Text.Trim();
-                            int gun = Convert.ToInt32(IOC.LinkOps.GetElementText(weKka).Trim().Substring(0, 2));
-                            int ay = Convert.ToInt32(IOC.LinkOps.GetElementText(weKka).Trim().Substring(3, 2));
-                            int yil = Convert.ToInt32(IOC.LinkOps.GetElementText(weKka).Trim().Substring(6, 4));
-                            dtpKka.Value = new DateTime(yil, ay, gun);
-                            if (bgw.CancellationPending == true) { e.Cancel = true;  }
-                            if (IOC.LinkOps.GetElementText(weKkc).Trim() != string.Empty)
+                            int gunKka = Convert.ToInt32(kkaText.Substring(0, 2));
+                            int ayKka = Convert.ToInt32(kkaText.Substring(3, 2));
+                            int yilKka = Convert.ToInt32(kkaText.Substring(6, 4));
+
+                            // UI Güncellemeleri tamamen Invoke bloğuna taşındı
+                            Invoke((Action)(() =>
                             {
-                                gun = Convert.ToInt32(IOC.LinkOps.GetElementText(weKkc).Trim().Substring(0, 2)); //  15/03/2014
-                                ay = Convert.ToInt32(IOC.LinkOps.GetElementText(weKkc).Trim().Substring(3, 2));
-                                yil = Convert.ToInt32(IOC.LinkOps.GetElementText(weKkc).Trim().Substring(6, 4));
-                                dtpKkc.Value = new DateTime(yil, ay, gun);
-                            }
-                            else
-                            {
-                                dtpKkc.Value = new DateTime(8923, 10, 29, 0 , 0, 0);
-                            }
+                                texCompanyRegNo.Text = cleanedRegNo;
+                                texCompanyTitle.Text = cleanedTitle;
+                                texCompanyAdress.Text = cleanedAdres;
+                                texBOSGM.Text = cleanedBosgm;
+                                dtpKka.Value = new DateTime(yilKka, ayKka, gunKka);
+
+                                if (!string.IsNullOrEmpty(kkcText))
+                                {
+                                    int gunKkc = Convert.ToInt32(kkcText.Substring(0, 2));
+                                    int ayKkc = Convert.ToInt32(kkcText.Substring(3, 2));
+                                    int yilKkc = Convert.ToInt32(kkcText.Substring(6, 4));
+                                    dtpKkc.Value = new DateTime(yilKkc, ayKkc, gunKkc);
+                                }
+                                else
+                                {
+                                    dtpKkc.Value = new DateTime(8923, 10, 29, 0, 0, 0);
+                                }
+                            }));
+
+                            if (bgw.CancellationPending) { e.Cancel = true; }
+                            currentRegNo = cleanedRegNo;
                             counter++;
-                            
                         }
-                        if (bgw.CancellationPending == true) { e.Cancel = true;  }
+                        if (bgw.CancellationPending) { e.Cancel = true; }
                     }
-                    else if(msg.Contains("iptal")) { e.Cancel = true; return; }
+                    else if (msg.Contains("iptal")) { e.Cancel = true; return; }
                     else if (msg == "continue" || msg.Contains("Hata") || msg == "continueGoAhead")
                     {
                         Invoke((Action)(() =>
                         {
-                            lblMessage.Text = $"{login.CompanyName} adlı firmanın bilgilerine ulaşılamadı {IOC.SgkLinksService.Message}"; 
+                            lblMessage.Text = $"{login.CompanyName} adlı firmanın bilgilerine ulaşılamadı {IOC.SgkLinksService.Message}";
                         }));
                         return;
                     }
                 }
                 catch (Exception ex)
                 {
-                    msg = ex.Message.ToString();
+                    msg = ex.Message;
                     Invoke((Action)(() =>
                     {
                         lblMessage.Text = "SGK İşveren Sisteminden bilgiler alınamadı! Tekrar deneyiniz";
@@ -259,9 +310,9 @@ namespace SgkAssistant.Forms.Defs
                 }
                 finally
                 {
-                    lblReport.Text += "</span></strong></ul></html>";
+                    Invoke((Action)(() => lblReport.Text += "</span></strong></ul></html>"));
                 }
-                if (bgw.CancellationPending == true) { e.Cancel = true; }
+                if (bgw.CancellationPending) { e.Cancel = true; }
                 if (Settings.Default.disposeDriver && Surucu.Driver != null) { Surucu.Driver.Dispose(); Surucu.Driver = null; }
             }
         }

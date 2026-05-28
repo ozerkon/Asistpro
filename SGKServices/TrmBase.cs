@@ -29,6 +29,7 @@ namespace SGKServices
                 if (System.IO.Directory.Exists(folderToCreate) == false)
                 {
                     System.IO.Directory.CreateDirectory(folderToCreate);
+                    folderCreated = true; // Set flag when folder is created
                 }
                 else
                 {
@@ -70,6 +71,11 @@ namespace SGKServices
             msg = "";
             try
             {
+                if (Surucu.Driver == null)
+                {
+                    msg = "Driver not initialized";
+                    return;
+                }
                 Surucu.Driver.SwitchTo().Alert().Dismiss();
             }
             catch (NoAlertPresentException)
@@ -78,6 +84,11 @@ namespace SGKServices
             }
             try
             {
+                if (Surucu.Driver == null)
+                {
+                    msg = "Driver not initialized";
+                    return;
+                }
                 WebDriverWait wait = GetWait();
                 wait.Until(e => ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript("return document.readyState").Equals("complete"));
             }
@@ -90,12 +101,17 @@ namespace SGKServices
         {
             try
             {
+                if (Surucu.Driver == null)
+                {
+                    return null;
+                }
                 WebDriverWait wait = new WebDriverWait(Surucu.Driver, TimeSpan.FromSeconds(timeoutInSeconds));
-                return wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(locator));
+
+                // Eski SeleniumExtras satırı silindi, yerine Selenium 4'ün yerleşik yapısı eklendi:
+                return wait.Until(d => d.FindElement(locator));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string aaaa = ex.Message;
                 return null;
             }
         }

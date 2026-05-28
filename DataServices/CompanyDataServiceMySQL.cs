@@ -65,7 +65,13 @@ namespace DataServices
             msg = "";
             try
             {
-                return ConLocal.QueryAsync<string>("SELECT sgscenc FROM companycheck WHERE id = 1").Result.First();
+                var result = ConLocal.QueryAsync<string>("SELECT sgscenc FROM companycheck WHERE id = 1").Result.FirstOrDefault();
+                if (result == null)
+                {
+                    msg = "No data found";
+                    return null;
+                }
+                return result;
             }
             catch (Exception ex)
             {
@@ -95,9 +101,16 @@ namespace DataServices
             msg = ""; 
             try
             {
-                string sql = "SELECT id, CompanyName, CompanyID, CompanyID2, SystemPassword, CompanyPassword, fm, gun, gp, gs, sgsc, unvan, adres, sgm, kka, kkc, sc1, sc2, sc3, sc4, sc5, cu, cd FROM company WHERE fm = @p1 AND id = @p2";
-                lstCom = ConLocal.QueryAsync<Company>(sql, new { p1 = fm, p2 = fm}).Result.ToList();
-                if (lstCom != null) lstCom = EncryptDs.DecryptCompany(lstCom);
+                string sql = "SELECT id, CompanyName, CompanyID, CompanyID2, SystemPassword, CompanyPassword, fm, gun, gp, gs, sgsc, unvan, adres, sgm, kka, kkc, sc1, sc2, sc3, sc4, sc5, cu, cd FROM company WHERE fm = @p1";
+                lstCom = ConLocal.QueryAsync<Company>(sql, new { p1 = fm}).Result.ToList();
+                if (lstCom != null && lstCom.Count > 0) 
+                {
+                    lstCom = EncryptDs.DecryptCompany(lstCom);
+                }
+                else
+                {
+                    lstCom = new List<Company>();
+                }
                 return lstCom;
             }
             catch (Exception ex)

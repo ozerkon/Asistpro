@@ -33,19 +33,19 @@
       <Value Profile="(Default)">K82964397288957</Value>
     </Setting>
     <Setting Name="mschostR" Type="System.String" Scope="User">
-      <Value Profile="(Default)">+rjzHzKMjV9Wh07YyS3osQ==</Value>
+      <Value Profile="(Default)">mysql-1ad3d050-hulusi.b.aivencloud.com</Value>
     </Setting>
     <Setting Name="mscuidR" Type="System.String" Scope="User">
-      <Value Profile="(Default)">aAXHjzruFVJ0G95xxMPwKw==</Value>
+      <Value Profile="(Default)">avnadmin</Value>
     </Setting>
     <Setting Name="mscupR" Type="System.String" Scope="User">
-      <Value Profile="(Default)">hHPZSNcjVkRgcb5v7vrQqSHJD2YwuX3BJYoiUq3KiDA=</Value>
+      <Value Profile="(Default)">LxK+190510.</Value>
     </Setting>
     <Setting Name="mscdbR" Type="System.String" Scope="User">
-      <Value Profile="(Default)">aAXHjzruFVJ0G95xxMPwKw==</Value>
+      <Value Profile="(Default)">defaultdb</Value>
     </Setting>
     <Setting Name="mscprtR" Type="System.String" Scope="User">
-      <Value Profile="(Default)">borXcW0ZPl8UN3BHvmvToQ==</Value>
+      <Value Profile="(Default)">18266</Value>
     </Setting>
     <Setting Name="cmpCheck" Type="System.String" Scope="User">
       <Value Profile="(Default)">Gv*6BF37hgPB586esD?hv?_MF&amp;ra@Ps6zzvpCefwxWGQr$DS-bQLZdQpW$8zvxGN</Value>

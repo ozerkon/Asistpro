@@ -90,7 +90,18 @@ namespace DataServices
             msg = "";
             try
             {
-                Users u = GetAllUsers(out msg).OrderByDescending(x => x.Id).FirstOrDefault();
+                var users = GetAllUsers(out msg);
+                if (users == null || users.Count == 0)
+                {
+                    msg = "No users found";
+                    return String.Empty;
+                }
+                Users u = users.OrderByDescending(x => x.Id).FirstOrDefault();
+                if (u == null)
+                {
+                    msg = "User not found";
+                    return String.Empty;
+                }
                 return u.Hc;
             }
             catch (Exception ex)

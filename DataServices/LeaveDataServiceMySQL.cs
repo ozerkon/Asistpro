@@ -82,8 +82,18 @@ namespace DataServices
         {
             try
             {
-                Personal p = (from x in GlobalVars.Personals where x.Id == leave.Pid select x).FirstOrDefault();
                 msg = "";
+                if (GlobalVars.Personals == null)
+                {
+                    msg = "Personals list is null";
+                    return -1;
+                }
+                Personal p = (from x in GlobalVars.Personals where x.Id == leave.Pid select x).FirstOrDefault();
+                if (p == null)
+                {
+                    msg = "Personal not found";
+                    return -1;
+                }
                 Leaves alv = GetLeaveByPidAndDate(p.Id, leave.Startdate, leave.Enddate, leave.Ph, out msg);
                 if (alv == null) { lcmd.Insert(leave); return 1; }
                 else { return 0; }

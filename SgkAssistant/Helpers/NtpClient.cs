@@ -49,40 +49,39 @@ namespace SgkAssistant.Helpers
         }
         public static DateTime GetNetworkTime(IPEndPoint ep)
         {
-            Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            using (Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            {
+                try
+                {
+                    s.Connect(ep);
 
-            s.Connect(ep);
+                    byte[] ntpData = new byte[48]; // RFC 2030 
+                    ntpData[0] = 0x1B;
+                    for (int i = 1; i < 48; i++)
+                        ntpData[i] = 0;
 
-            byte[] ntpData = new byte[48]; // RFC 2030 
-            ntpData[0] = 0x1B;
-            for (int i = 1; i < 48; i++)
-                ntpData[i] = 0;
+                    s.Send(ntpData);
+                    s.Receive(ntpData);
 
-            s.Send(ntpData);
-            s.Receive(ntpData);
+                    byte offsetTransmitTime = 40;
+                    ulong intpart = 0;
+                    ulong fractpart = 0;
 
-            byte offsetTransmitTime = 40;
-            ulong intpart = 0;
-            ulong fractpart = 0;
+                    for (int i = 0; i <= 3; i++)
+                        intpart = 256 * intpart + ntpData[offsetTransmitTime + i];
 
-            for (int i = 0; i <= 3; i++)
-                intpart = 256 * intpart + ntpData[offsetTransmitTime + i];
+                    for (int i = 4; i <= 7; i++)
+                        fractpart = 256 * fractpart + ntpData[offsetTransmitTime + i];
 
-            for (int i = 4; i <= 7; i++)
-                fractpart = 256 * fractpart + ntpData[offsetTransmitTime + i];
-
-            ulong milliseconds = (intpart * 1000 + (fractpart * 1000) / 0x100000000L);
-            s.Close();
-
-            TimeSpan timeSpan = TimeSpan.FromTicks((long)milliseconds * TimeSpan.TicksPerMillisecond);
-
-            DateTime dateTime = new DateTime(1900, 1, 1);
-            dateTime += timeSpan;
-
-            TimeSpan offsetAmount = TimeZone.CurrentTimeZone.GetUtcOffset(dateTime);
-            DateTime networkDateTime = (dateTime + offsetAmount);
-
-            return networkDateTime;
+                    ulong milliseconds = (intpart * 1000 + (fractpart * 1000) / 0x100000000L);
+                    return (new DateTime(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds((long)milliseconds)).ToLocalTime();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"NTP error: {ex.Message}");
+                    throw;
+                }
+            }
         }
         public static string Complication(DateTime dt, out string msg)
         {

@@ -22,9 +22,10 @@ namespace SgkAssistant.Helpers
         public LeavePeriod activePeriod, prevPeriod;
         public void AddPersonal(Personal personal, out string msg)
         {
+            msg = "";
             DateTime zeroTime = new DateTime(1, 1, 1);
             TimeSpan span = DateTime.Now.Subtract(personal.Dtr.AddDays(2));
-            int years = Convert.ToInt32(span.Hours) < 0 ? 0 : (zeroTime + span).Year - 1;
+            int years = Convert.ToInt32(span.Days / 365.25) < 0 ? 0 : (zeroTime + span).Year - 1;
             if (years < 15)
             {
                 DialogResult confirmResult = RadMessageBox.Show("15 yaşından küçük personel ekliyorsunuz, devam edilsin mi?", "15 yaşından küçük personel!", MessageBoxButtons.YesNo, RadMessageIcon.Question);
@@ -53,7 +54,16 @@ namespace SgkAssistant.Helpers
             int result = IOC.PersonalDataService.AddPersonal(personal, out msg);
             if (result == 1)
             {
-                GlobalVars.Personals.Add(personal); this.personal = null;
+                if (GlobalVars.Personals != null)
+                {
+                    GlobalVars.Personals.Add(personal);
+                }
+                else
+                {
+                    msg = "Personals list not initialized";
+                    return;
+                }
+                this.personal = null;
                 PersonalChange.HasChanged = true; PersonalChange.HasChangedForDialogBox= true; 
                 SetPeriods(personal);
                 IOC.LeavePeriodDataService.AddLeavePeriods(lstLeavePeriods, out msg);
@@ -144,6 +154,10 @@ namespace SgkAssistant.Helpers
                     {
                         for (DateTime day = alv.Startdate.Date; day.Date <= DateTime.Now.Date; day = day.AddDays(1))
                         {
+                            if (GlobalVars.PublicHolidays == null)
+                            {
+                                break;
+                            }
                             foreach (PublicHolidays ph in GlobalVars.PublicHolidays)
                             {
                                 if ((ph.Day.Date == day.Date && ph.Ft) || day.Date.DayOfWeek == DayOfWeek.Sunday) continue;

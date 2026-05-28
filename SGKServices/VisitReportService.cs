@@ -1,7 +1,6 @@
 ﻿using Models.Common;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -381,7 +380,14 @@ namespace SGKServices
             try
             {
                 WebDriverWait wait = GetWait();
-                IWebElement table = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath(tableXPath)));
+
+                // ExpectedConditions silindi, yerine elementin görünürlüğünü (Displayed) kontrol eden modern yapı eklendi
+                IWebElement table = wait.Until(d =>
+                {
+                    var el = d.FindElement(By.XPath(tableXPath));
+                    return el.Displayed ? el : null;
+                });
+
                 List<IWebElement> rows = Surucu.Driver.FindElements(By.XPath(rowsXPath)).ToList();
                 List<IWebElement> columns = Surucu.Driver.FindElements(By.XPath(columnsXPath)).ToList();
 
@@ -404,26 +410,39 @@ namespace SGKServices
             IWebElement linkReport;
             IWebElement btnSearch;
             WebDriverWait wait = GetWait();
+
+            // MODERN YAPI: Tekrarı önlemek için yerel metot (Local Function)
+            IWebElement WaitForVisible(string xpath)
+            {
+                return wait.Until(d =>
+                {
+                    var el = d.FindElement(By.XPath(xpath));
+                    return el.Displayed ? el : null;
+                });
+            }
+
             try
             {
                 commonFuncs.WaitForPageLoad(out msg);
                 if (commonFuncs.IsPageContains("Onay Bekleyen Rapor Listesi", out msg))
                 {
-                    IWebElement detayButon = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]")));
+                    // ExpectedConditions yerine WaitForVisible kullanıldı
+                    IWebElement detayButon = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]");
                     List<IWebElement> rows = Surucu.Driver.FindElements(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr")).ToList();
                     List<IWebElement> columns = Surucu.Driver.FindElements(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[3]/td")).ToList();
 
                     FillVisitClassList(lst, rows, rows.Count, columns.Count, out msg);
                 }
+
                 //Hastalık i = 2, Analık i = 3
                 for (int i = 2; i <= 3; i++)
                 {
-                    linkReport = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath(linkXPath)));
+                    linkReport = WaitForVisible(linkXPath);
                     if (GlobalVars.CancelProcess == true) { return (null, "iptal"); }
                     linkReport.Click();
+
                     switch (reportType)
                     {
-                        
                         case 1:
                             if (GlobalVars.CancelProcess == true) { return (null, "iptal"); }
                             commonFuncs.FillTextBox("mernisNo", SearchReport.KimlikNo, out msg);
@@ -437,14 +456,17 @@ namespace SGKServices
                             break;
                     }
                     if (GlobalVars.CancelProcess == true) { return (null, "iptal"); }
-                    btnSearch = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table/tbody/tr[4]/td/input")));
+
+                    btnSearch = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/form/table/tbody/tr[4]/td/input");
+
                     if (GlobalVars.CancelProcess == true) { return (null, "iptal"); }
                     btnSearch.Click();
                     commonFuncs.WaitForPageLoad(out msg);
+
                     if (commonFuncs.IsPageContains("Onay Bekleyen Rapor Listesi", out msg))
                     {
                         if (GlobalVars.CancelProcess == true) { return (null, "iptal"); }
-                        IWebElement detayButon = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]")));
+                        IWebElement detayButon = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]");
                         List<IWebElement> rows = Surucu.Driver.FindElements(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr")).ToList();
                         List<IWebElement> columns = Surucu.Driver.FindElements(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[3]/td")).ToList();
                         FillVisitClassList(lst, rows, rows.Count, columns.Count, out msg);
@@ -454,15 +476,14 @@ namespace SGKServices
                 {
                     return (lst, "");
                 }
-                return (null,"");
+                return (null, "");
             }
             catch (Exception ex)
             {
                 msg = ex.Message.ToString();
-                return (null,"");
+                return (null, "");
             }
         }
-
         public (List<SourceIgb>, List<SourceSpvudk>, List<SourceSraod>) GetReportDetails(VisitsToBeProcessed V, out string msg)
         {
             msg = ""; string kngaMessage = "", kngaTitle = ""; List<Visit> v;
@@ -472,14 +493,26 @@ namespace SGKServices
             SearchReport.ProcessType = 5;
             SearchReport.IsMultiSearch = false;
             WebDriverWait wait = GetWait();
+
+            // MODERN YAPI: Tekrarı önlemek için yerel metot
+            IWebElement WaitForVisible(string xpath)
+            {
+                return wait.Until(d =>
+                {
+                    var el = d.FindElement(By.XPath(xpath));
+                    return el.Displayed ? el : null;
+                });
+            }
+
             IWebElement btnShowDetail = null; IWebElement reportListTable = null;
             IWebElement tableIgb = null; IWebElement tableSpvudk = null; IWebElement tableSraob;
             List<SourceIgb> sourceIgBs = new List<SourceIgb>();
             List<SourceSpvudk> sourceSpvudKs = new List<SourceSpvudk>();
             List<SourceSraod> sourceSraoDs = new List<SourceSraod>();
-            SourceIgb sourceIgb ;
+            SourceIgb sourceIgb;
             SourceSpvudk sourceSpvudk;
-            SourceSraod sourceSraod ;
+            SourceSraod sourceSraod;
+
             try
             {
                 switch (reportType)
@@ -488,32 +521,36 @@ namespace SGKServices
                     case 2:
                         SearchReport.KimlikNo = V.Tcno;
                         SearchReport.CaseType = (V.Vaka == "IS KAZASI") ? 1 : (V.Vaka == "HASTALIK") ? 2 : (V.Vaka == "ANALIK") ? 3 : 4;
-                        (v, kngaMessage, kngaTitle) = KimlikNoyaGoreArama(out msg); if (kngaMessage == "iptal") { msg = "iptal";  return (null , null, null); }
+                        (v, kngaMessage, kngaTitle) = KimlikNoyaGoreArama(out msg); if (kngaMessage == "iptal") { msg = "iptal"; return (null, null, null); }
                         wait.Until(e => ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript("return document.readyState").Equals("complete"));
-                        reportListTable = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]")));
-                        btnShowDetail = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]")));
+
+                        reportListTable = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/form/table[1]");
+                        btnShowDetail = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]");
                         break;
                     case 3:
                         SearchReport.StartDate = V.PoliklinikTarihi;
                         SearchReport.EndDate = V.PoliklinikTarihi;
-                        (v, kngaMessage, kngaTitle) = OnayliRaporlar(out msg); if (kngaMessage == "iptal") { msg = "iptal";  return (null , null, null); }
+                        (v, kngaMessage, kngaTitle) = OnayliRaporlar(out msg); if (kngaMessage == "iptal") { msg = "iptal"; return (null, null, null); }
                         wait.Until(e => ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript("return document.readyState").Equals("complete"));
-                        reportListTable = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]")));
-                        btnShowDetail = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input")));
+
+                        reportListTable = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/form/table[1]");
+                        btnShowDetail = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input");
                         break;
                     case 4:
                         SearchReport.StartDate = V.RaporBaslamaTarihi;
                         SearchReport.EndDate = V.RaporBaslamaTarihi;
-                        (v, kngaMessage, kngaTitle) = ArsivdekiRaporlar(out msg); if (kngaMessage == "iptal") { msg = "iptal";  return (null , null, null); }
+                        (v, kngaMessage, kngaTitle) = ArsivdekiRaporlar(out msg); if (kngaMessage == "iptal") { msg = "iptal"; return (null, null, null); }
                         wait.Until(e => ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript("return document.readyState").Equals("complete"));
-                        reportListTable = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/center/table")));
-                        btnShowDetail = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/center/input")));
+
+                        reportListTable = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/form/center/table");
+                        btnShowDetail = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/form/center/input");
                         break;
                 }
 
                 IList<IWebElement> rows = reportListTable.FindElements(By.TagName("tr"));
                 IList<IWebElement> columns = reportListTable.FindElements(By.TagName("td"));
                 IWebElement radio;
+
                 if (reportType < 4)
                 {
                     radio = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[3]/td[1]/input"));
@@ -521,9 +558,8 @@ namespace SGKServices
                 else
                 {
                     radio = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/center/table/tbody/tr[3]/td[1]/input"));
-                    
                 }
-                
+
                 if (rows.Count > 3)
                 {
                     int index = 1;
@@ -540,18 +576,20 @@ namespace SGKServices
                         index++;
                     }
                 }
+
                 radio.Click();
                 if (GlobalVars.CancelProcess == true) { msg = "iptal"; return (null, null, null); }
                 btnShowDetail.Click();
-                
+
                 wait.Until(e => ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript("return document.readyState").Equals("complete"));
+
                 if (reportType == 3)
                 {
                     if (GlobalVars.CancelProcess == true) { msg = "iptal"; return (null, null, null); }
 
-                    tableSraob = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table")));
+                    tableSraob = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/form/table");
                     List<IWebElement> tableSraobRows = tableSraob.FindElements(By.TagName("tr")).ToList();
-                    
+
                     sourceSraod = new SourceSraod();
                     sourceSraod.Col1 = Surucu.Driver.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/form/table/tbody/tr[2]/td[1]")).Text;
                     sourceSraod.Col2 = Surucu.Driver.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/form/table/tbody/tr[2]/td[2]")).Text;
@@ -559,7 +597,8 @@ namespace SGKServices
                     sourceSraod.Col4 = Surucu.Driver.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/form/table/tbody/tr[2]/td[4]")).Text;
                     sourceSraod.Col5 = Surucu.Driver.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/form/table/tbody/tr[2]/td[5]")).Text;
                     sourceSraoDs.Add(sourceSraod);
-                    for (int index = 3; index  <= tableSraobRows.Count; index ++)
+
+                    for (int index = 3; index <= tableSraobRows.Count; index++)
                     {
                         sourceSraod = new SourceSraod();
                         sourceSraod.Col1 = Surucu.Driver.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/form/table/tbody/tr[{index}]/td[1]")).Text;
@@ -575,73 +614,77 @@ namespace SGKServices
                 {
                     if (GlobalVars.CancelProcess == true) { msg = "iptal"; return (null, null, null); }
 
-                    tableIgb = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table")));
+                    tableIgb = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/center/table");
                     List<IWebElement> tableIgbRows = tableIgb.FindElements(By.TagName("tr")).ToList();
+
                     sourceIgb = new SourceIgb();
-                    sourceIgb.Col1 = "TC Kimlik No"; 
+                    sourceIgb.Col1 = "TC Kimlik No";
                     sourceIgb.Col2 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[2]/td[2]")).Text;
-                    sourceIgb.Col3 = "Ad Soyad"; 
+                    sourceIgb.Col3 = "Ad Soyad";
                     sourceIgb.Col4 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[2]/td[4]")).Text;
                     sourceIgBs.Add(sourceIgb); sourceIgb = new SourceIgb();
 
-                    sourceIgb.Col1 = "Rapor Takip No"; 
+                    sourceIgb.Col1 = "Rapor Takip No";
                     sourceIgb.Col2 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[3]/td[2]")).Text;
-                    sourceIgb.Col3 = "Rapor Sıra No"; 
+                    sourceIgb.Col3 = "Rapor Sıra No";
                     sourceIgb.Col4 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[3]/td[4]")).Text;
                     sourceIgBs.Add(sourceIgb); sourceIgb = new SourceIgb();
 
-                    sourceIgb.Col1 = "Sağlık Tesisi Adı"; 
+                    sourceIgb.Col1 = "Sağlık Tesisi Adı";
                     sourceIgb.Col2 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[4]/td[2]")).Text;
-                    sourceIgb.Col3 = "Düzenleyen Poliklinik Kodu"; 
+                    sourceIgb.Col3 = "Düzenleyen Poliklinik Kodu";
                     sourceIgb.Col4 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[4]/td[4]")).Text;
                     sourceIgBs.Add(sourceIgb); sourceIgb = new SourceIgb();
 
-                    sourceIgb.Col1 = "Polikinik Tarihi"; 
+                    sourceIgb.Col1 = "Polikinik Tarihi";
                     sourceIgb.Col2 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[5]/td[2]")).Text;
-                    sourceIgb.Col3 = "Poliklinik Defter Sıra No"; 
+                    sourceIgb.Col3 = "Poliklinik Defter Sıra No";
                     sourceIgb.Col4 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[5]/td[4]")).Text;
                     sourceIgBs.Add(sourceIgb); sourceIgb = new SourceIgb();
 
-                    sourceIgb.Col1 = "Vaka"; 
+                    sourceIgb.Col1 = "Vaka";
                     sourceIgb.Col2 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[6]/td[2]")).Text;
-                    sourceIgb.Col3 = "Rapor Durumu"; 
+                    sourceIgb.Col3 = "Rapor Durumu";
                     sourceIgb.Col4 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[6]/td[4]")).Text;
                     sourceIgBs.Add(sourceIgb); sourceIgb = new SourceIgb();
 
-                    sourceIgb.Col1 = "Hastane Yatış Tarihi"; 
+                    sourceIgb.Col1 = "Hastane Yatış Tarihi";
                     sourceIgb.Col2 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[7]/td[2]")).Text;
-                    sourceIgb.Col3 = "Hastane Çıkıs Tarihi"; 
+                    sourceIgb.Col3 = "Hastane Çıkıs Tarihi";
                     sourceIgb.Col4 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[7]/td[4]")).Text;
                     sourceIgBs.Add(sourceIgb); sourceIgb = new SourceIgb();
 
-                    sourceIgb.Col1 = "Rapor Baslama Tarihi"; 
+                    sourceIgb.Col1 = "Rapor Baslama Tarihi";
                     sourceIgb.Col2 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[8]/td[2]")).Text;
-                    sourceIgb.Col3 = "Rapor Bitiş Tarihi"; 
+                    sourceIgb.Col3 = "Rapor Bitiş Tarihi";
                     sourceIgb.Col4 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[8]/td[4]")).Text;
                     sourceIgBs.Add(sourceIgb); sourceIgb = new SourceIgb();
 
-                    sourceIgb.Col1 = "Rapor Türü"; 
+                    sourceIgb.Col1 = "Rapor Türü";
                     sourceIgb.Col2 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[9]/td[2]")).Text;
-                    sourceIgb.Col3 = "Ekrana Düştüğü Tarih"; 
+                    sourceIgb.Col3 = "Ekrana Düştüğü Tarih";
                     sourceIgb.Col4 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[9]/td[4]")).Text;
                     sourceIgBs.Add(sourceIgb); sourceIgb = new SourceIgb();
 
-                    sourceIgb.Col1 = "İş Kazası Tarihi"; 
+                    sourceIgb.Col1 = "İş Kazası Tarihi";
                     sourceIgb.Col2 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[10]/td[2]")).Text;
-                    sourceIgb.Col3 = String.Empty; 
+                    sourceIgb.Col3 = String.Empty;
                     sourceIgb.Col4 = String.Empty;
                     sourceIgBs.Add(sourceIgb);
+
                     if (tableIgbRows.Count == 11)
                     {
                         sourceIgb = new SourceIgb();
-                        sourceIgb.Col1 = "İzin Başlama Tarihi"; 
+                        sourceIgb.Col1 = "İzin Başlama Tarihi";
                         sourceIgb.Col2 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[11]/td[2]")).Text;
-                        sourceIgb.Col3 = "Tahmini Bebek Dogum Tarihi"; 
+                        sourceIgb.Col3 = "Tahmini Bebek Dogum Tarihi";
                         sourceIgb.Col4 = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[11]/td[4]")).Text;
-                        sourceIgBs.Add(sourceIgb); 
+                        sourceIgBs.Add(sourceIgb);
                     }
+
                     tableSpvudk = IsElementEXISTS(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/form/table[1]"));
                     List<IWebElement> tableSpvudkRows = tableSpvudk.FindElements(By.TagName("tr")).ToList();
+
                     if (tableSpvudkRows.Count > 2)
                     {
                         if (GlobalVars.CancelProcess == true) { msg = "iptal"; return (null, null, null); }
@@ -649,7 +692,8 @@ namespace SGKServices
                         sourceSpvudk = new SourceSpvudk();
                         sourceSpvudk.Col1 = "Yıl"; sourceSpvudk.Col2 = "Ay"; sourceSpvudk.Col3 = "Prim"; sourceSpvudk.Col4 = "Ücret Dışı Kazançlar";
                         sourceSpvudKs.Add(sourceSpvudk); sourceSpvudk = new SourceSpvudk();
-                        for (int i = 3; i < tableSpvudkRows.Count ; i++)
+
+                        for (int i = 3; i < tableSpvudkRows.Count; i++)
                         {
                             sourceSpvudk.Col1 = Surucu.Driver.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/center/form/table[1]/tbody/tr[{i}]/td[1]")).Text;
                             sourceSpvudk.Col2 = Surucu.Driver.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/center/form/table[1]/tbody/tr[{i}]/td[2]")).Text;
@@ -658,63 +702,81 @@ namespace SGKServices
                             sourceSpvudKs.Add(sourceSpvudk); sourceSpvudk = new SourceSpvudk();
                         }
 
-                        sourceSpvudk.Col1 = "Sigortalının Günlük Kazancı (PEK)"; 
+                        sourceSpvudk.Col1 = "Sigortalının Günlük Kazancı (PEK)";
                         sourceSpvudk.Col2 = Surucu.Driver.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/center/form/table[1]/tbody/tr[{tableSpvudkRows.Count}]/td[2]")).Text;
-                        sourceSpvudk.Col3 = String.Empty; 
+                        sourceSpvudk.Col3 = String.Empty;
                         sourceSpvudk.Col4 = String.Empty;
                         sourceSpvudKs.Add(sourceSpvudk);
                     }
                 }
-                
+
                 DetailsNameTc.Tcno = V.Tcno;
                 DetailsNameTc.Name = V.AdSoyad;
             }
             catch (Exception ex)
             {
                 msg = ex.Message.ToString();
-                return (null, null, null); 
+                return (null, null, null);
             }
+
             Visits.Clear(); tempVisit.Clear();
-            //if (GlobalVars.DisposeDriver) Surucu.Driver.Dispose();
             return (sourceIgBs, sourceSpvudKs, sourceSraoDs);
         }
 
-        public (DateTime,DateTime,string) GetReportDetails(Visit V, out string msg) // Analık türündeki raporlar için
+        public (DateTime, DateTime, string) GetReportDetails(Visit V, out string msg) // Analık türündeki raporlar için
         {
             commonFuncs.SetDriver(Surucu.Driver);
-            msg = ""; string tarihRba = ""; string tarihRbi = ""; string durum = ""; string kngaMessage = "", kngaTitle = ""; List<Visit> v;
+            msg = "";
+            string tarihRba = "";
+            string tarihRbi = "";
+            string durum = "";
+            string kngaMessage = "", kngaTitle = "";
+            List<Visit> v;
+
             string rbtOld = V.RaporBaslamaTarihi.ToString("yyyy-MM-dd");
             string ibtOld = V.IsBasiKontrolTarihi.ToString("yyyy-MM-dd");
             SearchReport.ProcessType = 5;
             SearchReport.IsMultiSearch = false;
             WebDriverWait wait = GetWait();
-            IWebElement btnShowDetail = null; IWebElement reportListTable = null;
+
+            // MODERN YAPI: Tekrarı önlemek için yerel metot
+            IWebElement WaitForVisible(string xpath)
+            {
+                return wait.Until(d =>
+                {
+                    var el = d.FindElement(By.XPath(xpath));
+                    return el.Displayed ? el : null;
+                });
+            }
+
             try
             {
                 SearchReport.KimlikNo = V.Tcno;
-                SearchReport.CaseType = 3 ;
-                (v, kngaMessage, kngaTitle) = KimlikNoyaGoreArama(out msg); if (kngaMessage == "iptal") { return (DateTime.MinValue, DateTime.MinValue, "iptal");   }
+                SearchReport.CaseType = 3;
+                (v, kngaMessage, kngaTitle) = KimlikNoyaGoreArama(out msg);
+                if (kngaMessage == "iptal") { return (DateTime.MinValue, DateTime.MinValue, "iptal"); }
+
                 wait.Until(e => ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript("return document.readyState").Equals("complete"));
-                reportListTable = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]")));
-                btnShowDetail = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]")));
+
+                // ExpectedConditions silindi, WaitForVisible kullanıldı
+                IWebElement reportListTable = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/form/table[1]");
+                IWebElement btnShowDetail = WaitForVisible("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]");
+
                 if (GlobalVars.CancelProcess) { return (DateTime.MinValue, DateTime.MinValue, "iptal"); }
+
                 IList<IWebElement> rows = reportListTable.FindElements(By.TagName("tr"));
-                IList<IWebElement> columns = reportListTable.FindElements(By.TagName("td"));
-                IWebElement radio;
-                radio = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[3]/td[1]/input"));
-                
+                IWebElement radio = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[3]/td[1]/input"));
+
                 if (rows.Count > 3)
                 {
                     int index = 1;
-                    string rsn = "";
-                   
                     foreach (IWebElement row in rows)
                     {
                         if (GlobalVars.CancelProcess) { return (DateTime.MinValue, DateTime.MinValue, "iptal"); }
 
                         if (index > 2)
                         {
-                            rsn = row.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[{index}]/td[6]")).Text;
+                            string rsn = row.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[{index}]/td[6]")).Text;
                             if (row.Text.Contains(V.RaporTakipNo) && V.RaporSiraNo.ToString() == rsn && row.Text.Contains(rbtOld) && row.Text.Contains(ibtOld))
                             {
                                 radio = row.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[{index}]/td[1]/input"));
@@ -724,24 +786,25 @@ namespace SGKServices
                         index++;
                     }
                 }
+
                 radio.Click();
                 if (GlobalVars.CancelProcess) { return (DateTime.MinValue, DateTime.MinValue, "iptal"); }
 
                 btnShowDetail.Click();
                 commonFuncs.WaitForPageLoad(out msg);
+
                 if (commonFuncs.IsPageContains("Dogum Sonrasi Analik", out msg))
                 {
                     if (GlobalVars.CancelProcess) { return (DateTime.MinValue, DateTime.MinValue, "iptal"); }
-                    // hastane yatış tarihini bul
+
                     string hyt = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[7]/td[2]")).Text;
-                    if (hyt == "" || hyt == "0001-01-01")
+                    if (string.IsNullOrWhiteSpace(hyt) || hyt == "0001-01-01")
                     {
                         if (GlobalVars.CancelProcess) { return (DateTime.MinValue, DateTime.MinValue, "iptal"); }
                         tarihRba = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[8]/td[2]")).Text;
                     }
                     else
                     {
-                        if (GlobalVars.CancelProcess) { return (DateTime.MinValue, DateTime.MinValue, "iptal"); }
                         tarihRba = hyt;
                     }
 
@@ -751,8 +814,10 @@ namespace SGKServices
                 else if (commonFuncs.IsPageContains("Dogum Oncesi Analik Calisir", out msg))
                 {
                     if (GlobalVars.CancelProcess) { return (DateTime.MinValue, DateTime.MinValue, "iptal"); }
+
                     tarihRba = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[11]/td[2]")).Text;
                     string rbit = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[8]/td[4]")).Text;
+
                     if (rbit.Contains("0001"))
                     {
                         if (GlobalVars.CancelProcess) { return (DateTime.MinValue, DateTime.MinValue, "iptal"); }
@@ -760,41 +825,64 @@ namespace SGKServices
                     }
                     else
                     {
-                        if (GlobalVars.CancelProcess) { return (DateTime.MinValue, DateTime.MinValue, "iptal"); }
                         tarihRbi = rbit;
                     }
-                    
+
                     durum = "Doğum Öncesi Analık, Çalışır";
                 }
+
+                // Return işlemini güvenli parse ile try bloğu içinde yapıyoruz
+                DateTime parsedRba = string.IsNullOrWhiteSpace(tarihRba) ? DateTime.MinValue : DateTime.Parse(tarihRba);
+                DateTime parsedRbi = string.IsNullOrWhiteSpace(tarihRbi) ? DateTime.MinValue : DateTime.Parse(tarihRbi);
+
+                return (parsedRba, parsedRbi, durum);
             }
             catch (Exception ex)
             {
                 msg = ex.Message.ToString();
+                // Hata durumunda parse etmeye çalışıp programı çökertecek yapıyı önlüyoruz
+                return (DateTime.MinValue, DateTime.MinValue, "Hata oluştu");
             }
-            
-            return (DateTime.Parse(tarihRba), DateTime.Parse(tarihRbi), durum);
-
-        } // vaka durummu ANNALIK olanlar için
+        }
         #endregion
 
         #region raporonaylama_ve_iptal_etme
 
         public (string, string, int) DoConfirmReport(List<VisitsToBeProcessed> onaylanacaklar, out string msg)
         {
-            msg = ""; string kngaMessage = "", kngaTitle = ""; List<Visit> v; commonFuncs.SetDriver(Surucu.Driver);
+            msg = "";
+            string kngaMessage = "", kngaTitle = "";
+            List<Visit> v;
+            commonFuncs.SetDriver(Surucu.Driver);
 
             int reportType = SearchReport.ReportType;
             SearchReport.ProcessType = 5;
             SearchReport.IsMultiSearch = false;
             WebDriverWait wait = GetWait();
-            IWebElement btnShowDetail = null; IWebElement reportListTable = null;
+
+            IWebElement btnShowDetail = null;
+            IWebElement reportListTable = null;
             ConfirmReport cr;
+
+            // MODERN YAPI: Hem görünürlük hem de isteğe bağlı tıklanabilirlik kontrolü yapan yerel metot
+            IWebElement WaitForElement(By locator, bool requireClickable = false)
+            {
+                return wait.Until(d =>
+                {
+                    var el = d.FindElements(locator).FirstOrDefault(e => e.Displayed);
+                    if (el != null && requireClickable && !el.Enabled) return null;
+                    return el;
+                });
+            }
+
             try
             {
                 foreach (VisitsToBeProcessed V in onaylanacaklar)
                 {
-                    if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0); }
+                    if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
+
                     cr = new ConfirmReport();
+
                     switch (reportType)
                     {
                         case 1:
@@ -802,42 +890,52 @@ namespace SGKServices
                             SearchReport.KimlikNo = V.Tcno;
                             SearchReport.CaseType = (V.Vaka == "IS KAZASI") ? 1 : (V.Vaka == "HASTALIK") ? 2 : (V.Vaka == "ANALIK") ? 3 : 4;
                             cr.Vaka = V.Vaka;
-                            (v, kngaMessage, kngaTitle) = KimlikNoyaGoreArama(out msg); if(kngaMessage == "iptal") { return ("iptal", RgvTitleText, 0); }
+
+                            (v, kngaMessage, kngaTitle) = KimlikNoyaGoreArama(out msg);
+                            if (kngaMessage == "iptal") return ("iptal", RgvTitleText, 0);
+
                             wait.Until(e => ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript("return document.readyState").Equals("complete"));
-                            reportListTable = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]")));
-                            btnShowDetail = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]")));
+
+                            reportListTable = WaitForElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]"));
+                            btnShowDetail = WaitForElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]"));
                             break;
+
                         case 4:
                             SearchReport.StartDate = V.RaporBaslamaTarihi;
                             SearchReport.EndDate = V.RaporBaslamaTarihi;
 
-                            (v, kngaMessage, kngaTitle) = ArsivdekiRaporlar(out msg); if (kngaMessage == "iptal") { return ("iptal", RgvTitleText, 0); }
+                            (v, kngaMessage, kngaTitle) = ArsivdekiRaporlar(out msg);
+                            if (kngaMessage == "iptal") return ("iptal", RgvTitleText, 0);
+
                             wait.Until(e => ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript("return document.readyState").Equals("complete"));
-                            reportListTable = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/center/table")));
-                            btnShowDetail = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/center/input")));
+
+                            reportListTable = WaitForElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/center/table"));
+                            btnShowDetail = WaitForElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/center/input"));
                             wait.Until(e => ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript("return document.readyState").Equals("complete"));
-                                
                             break;
                     }
+
                     IList<IWebElement> rows = reportListTable.FindElements(By.TagName("tr"));
-                    IList<IWebElement> columns = reportListTable.FindElements(By.TagName("td"));
                     IWebElement radio;
+
                     if (reportType < 4)
                     {
-                        if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0); }
+                        if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
                         radio = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[3]/td[1]/input"));
                     }
                     else
                     {
-                        if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0); }
+                        if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
                         radio = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/center/table/tbody/tr[3]/td[1]/input"));
                     }
+
                     if (rows.Count > 3)
                     {
                         int index = 1;
                         foreach (IWebElement row in rows)
                         {
-                            if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0); }
+                            if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
+
                             if (reportType < 4 && row.Text.Contains(V.RaporTakipNo))
                             {
                                 radio = row.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[{index}]/td[1]/input"));
@@ -849,10 +947,15 @@ namespace SGKServices
                             index++;
                         }
                     }
-                    if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0); }
+
+                    if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
                     radio.Click();
 
-                    IWebElement texConfirmDate; IWebElement comboWorkingStatus; IWebElement btnOnay; IWebElement btnPersonelimDegil;
+                    IWebElement texConfirmDate;
+                    IWebElement comboWorkingStatus;
+                    IWebElement btnOnay;
+                    IWebElement btnPersonelimDegil;
+
                     cr.Tcid = V.Tcno;
                     cr.Fullname = V.AdSoyad;
                     cr.Rtno = V.RaporTakipNo;
@@ -860,55 +963,64 @@ namespace SGKServices
                     cr.Rbat = V.RaporBaslamaTarihi;
                     cr.Rbit = V.RaporBitisTarihi;
                     cr.Onyt = DateTime.Now;
+
                     if (V.WorkingStatus != 2)
                     {
-                        if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0); }
+                        if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
                         btnShowDetail.Click();
+
                         if (SearchReport.ReportType == 4)
                         {
-                            if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0); }
+                            if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
                             V.RaporTakipNo = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[3]/td[2]")).Text;
                             V.RaporSiraNo = Convert.ToInt32(Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[3]/td[4]")).Text);
                         }
-                        if (Surucu.Driver.PageSource.Replace("  "," ").Contains(V.Tcno))
+
+                        if (Surucu.Driver.PageSource.Replace("  ", " ").Contains(V.Tcno))
                         {
-                            if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0); }
-                            texConfirmDate = wait.Until(ExpectedConditions.ElementIsVisible(By.Name("onayBitisTarihi")));
+                            if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
+
+                            texConfirmDate = WaitForElement(By.Name("onayBitisTarihi"));
                             if (V.ConfirmDate.Length == 18) { V.ConfirmDate = $"0{V.ConfirmDate}".Remove(10); }
                             texConfirmDate.SendKeys(V.ConfirmDate);
-                            comboWorkingStatus = wait.Until(ExpectedConditions.ElementIsVisible(By.Name("calismaDurumu")));
-                            // rapor için ödeme yapılmışsa, yalnızca "çalışmamıştır" seçeneği vardır. Öbür türlü "çalışmıştır" ya da "çalışmamıştır" seçilebilir.
-                            if (!Surucu.Driver.PageSource.Replace("  "," ").Contains("stirahat Raporu "))
+
+                            comboWorkingStatus = WaitForElement(By.Name("calismaDurumu"));
+
+                            // Rapor için ödeme yapılmışsa, yalnızca "çalışmamıştır" seçeneği vardır. Öbür türlü "çalışmıştır" ya da "çalışmamıştır" seçilebilir.
+                            if (!Surucu.Driver.PageSource.Replace("  ", " ").Contains("stirahat Raporu "))
                             {
                                 commonFuncs.ChangeComboBox(V.WorkingStatus, "calismaDurumu", out msg);
                             }
 
-                            btnOnay = wait.Until(ExpectedConditions.ElementIsVisible(By.Name("kaydet")));
-                                
+                            btnOnay = WaitForElement(By.Name("kaydet"));
+
                             if (reportType == 4)
                             {
-                                if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0); }
+                                if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
                                 cr.Vaka = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[6]/td[2]")).Text;
-                                cr.Rbit = DateTime.Parse( Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[8]/td[4]")).Text);
+                                cr.Rbit = DateTime.Parse(Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[8]/td[4]")).Text);
                                 cr.Rtno = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[3]/td[2]")).Text;
                                 cr.Rsno = Convert.ToInt32(Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/center/table/tbody/tr[3]/td[4]")).Text);
                             }
-                            if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0); }
+
+                            if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
                             btnOnay.Click();
-                                
-                            if (Surucu.Driver.PageSource.Replace("  "," ").Contains("başarıyla kaydedilmiştir"))
+
+                            if (Surucu.Driver.PageSource.Replace("  ", " ").Contains("başarıyla kaydedilmiştir"))
                             {
                                 cr.Rslt = "Rapor onaylandı";
                                 if (SearchReport.GetConfirmPdf)
                                 {
-                                    IWebElement btnDokum = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("/html/body/table[2]/tbody/tr/td[2]/table[3]/tbody/tr/td/a")));
+                                    IWebElement btnDokum = WaitForElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/table[3]/tbody/tr/td/a"), true);
                                     string oldFn = $@"{SearchReport.DownloadDir}PdfTable.pdf";
                                     string newFn = $@"{SearchReport.DocumentsDir}\{V.Cnm}-{V.AdSoyad}-{V.RaporTakipNo}-{V.RaporSiraNo}.pdf";
+
                                     if (File.Exists(oldFn))
                                     {
                                         File.Delete(oldFn);
                                     }
                                     btnDokum.Click();
+
                                     if (WaitForFileDl(oldFn))
                                     {
                                         if (ChangeFileName($"{oldFn}", $"{newFn}", out msg)) { cr.Pdffile = newFn; } else { cr.Pdffile = "Dosya indirilemedi"; }
@@ -916,54 +1028,76 @@ namespace SGKServices
                                     else { cr.Pdffile = "Dosya indirilemedi"; }
                                 }
                             }
-                            else if (Surucu.Driver.PageSource.Replace("  "," ").Contains("Gunun Tarihinden Sonra"))
+                            else if (Surucu.Driver.PageSource.Replace("  ", " ").Contains("Gunun Tarihinden Sonra"))
                             {
-
-                                SearchReport.ConfirmError = true; 
-                                cr.Rslt = $"Rapor onaylanamadı \"Sectiginiz Tarihler Günün Tarihinden Sonra Olamaz!\" hatası alındı. Rapor bitiş tarihi: {cr.Rbit.ToString("yyyy/MM/dd", CultureInfo.InvariantCulture)}, Seçtiğiniz Tarih: {V.ConfirmDate}"; 
+                                SearchReport.ConfirmError = true;
+                                cr.Rslt = $"Rapor onaylanamadı \"Sectiginiz Tarihler Günün Tarihinden Sonra Olamaz!\" hatası alındı. Rapor bitiş tarihi: {cr.Rbit.ToString("yyyy/MM/dd", CultureInfo.InvariantCulture)}, Seçtiğiniz Tarih: {V.ConfirmDate}";
                                 cr.Pdffile = "Dosya indirilemedi";
                             }
                             else
                             {
-                                SearchReport.ConfirmError = true; cr.Rslt = "Rapor onaylanamadı"; cr.Pdffile = "Dosya indirilemedi";
+                                SearchReport.ConfirmError = true;
+                                cr.Rslt = "Rapor onaylanamadı";
+                                cr.Pdffile = "Dosya indirilemedi";
                             }
                         }
                     }
                     else
                     {
-                        if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0); }
-                        btnPersonelimDegil = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[2]")));
+                        if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
+                        btnPersonelimDegil = WaitForElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[2]"));
                         btnPersonelimDegil.Click();
-                        if (Surucu.Driver.PageSource.Replace("  "," ").Contains("Sigortalinin Isveren Bilgileri Guncellenemedi."))
+
+                        if (Surucu.Driver.PageSource.Replace("  ", " ").Contains("Sigortalinin Isveren Bilgileri Guncellenemedi."))
                         {
-                            SearchReport.ConfirmError = true; cr.Rslt = "Personelim değil yapılamadı";
+                            SearchReport.ConfirmError = true;
+                            cr.Rslt = "Personelim değil yapılamadı";
                         }
                         else
                         {
                             cr.Rslt = "Personelim değil yapıldı";
-                        }    
+                        }
                     }
                     ConfirmReports.Add(cr);
                 }
             }
             catch (Exception ex)
             {
-                msg = ex.Message.ToString(); 
+                msg = ex.Message.ToString();
                 Message = $"Rapor onaylama işlemi tamamlanamadı, lütfen tekrar deneyin. Hata : {msg}";
                 return (Message, RgvTitleText, ConfirmReports.Count);
             }
+
             return (Message, RgvTitleText, ConfirmReports.Count);
         }
 
         public (string, string, int) DoCancelReport(List<VisitsToBeProcessed> iptalEdilecekler, out string msg)
         {
-            msg = ""; string kngaMessage , kngaTitle ; List<Visit> v; int cancelled = 0;
+            msg = "";
+            string kngaMessage, kngaTitle;
+            List<Visit> v;
+            int cancelled = 0;
+            commonFuncs.SetDriver(Surucu.Driver);
+
             ProcessReport ur;
+            WebDriverWait wait = GetWait();
+
+            // MODERN YAPI: DOM yenilenmelerine karşı elementi dinamik ve güvenli bekleyen yerel metot
+            IWebElement WaitForElement(By locator)
+            {
+                return wait.Until(d =>
+                {
+                    var el = d.FindElements(locator).FirstOrDefault(e => e.Displayed);
+                    return el;
+                });
+            }
+
             try
             {
                 foreach (VisitsToBeProcessed personel in iptalEdilecekler)
                 {
-                    if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0);  }
+                    if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
+
                     ur = new ProcessReport()
                     {
                         Tcid = personel.Tcno,
@@ -975,45 +1109,59 @@ namespace SGKServices
                         Rbit = personel.IsBasiKontrolTarihi,
                         Onyt = DateTime.Now
                     };
-                    
+
                     SearchReport.StartDate = personel.PoliklinikTarihi;
                     SearchReport.EndDate = personel.PoliklinikTarihi;
-                    (v, kngaMessage, kngaTitle) = OnayliRaporlar(out msg); if (kngaMessage == "iptal") { return ("iptal", RgvTitleText, 0);  }
-                    WebDriverWait wait = GetWait();
-                    if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0);  }
-                    IWebElement reportListTable = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]")));
-                    IList<IWebElement> rows = reportListTable.FindElements(By.TagName("tr"));
-                    IList<IWebElement> columns = reportListTable.FindElements(By.TagName("td"));
 
-                    IWebElement radio = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[3]/td[1]/input"));
-                    IWebElement btnOnay = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]"));
+                    (v, kngaMessage, kngaTitle) = OnayliRaporlar(out msg);
+                    if (kngaMessage == "iptal") return ("iptal", RgvTitleText, 0);
+
+                    if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
+
+                    // Tablo görünene kadar güvenli bekleme yapılıyor
+                    IWebElement reportListTable = WaitForElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]"));
+                    IList<IWebElement> rows = reportListTable.FindElements(By.TagName("tr"));
+
+                    // Dinamik locator tanımlamaları
+                    By radioLocator = By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[3]/td[1]/input");
+                    By btnOnayLocator = By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]");
+
+                    IWebElement radio = WaitForElement(radioLocator);
+                    IWebElement btnOnay = WaitForElement(btnOnayLocator);
+
                     if (rows.Count > 3)
                     {
                         int index = 1;
                         foreach (IWebElement row in rows)
                         {
-                            if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0);  }
+                            if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
                             if (row.Text.Contains(personel.RaporTakipNo))
                             {
                                 radio = row.FindElement(By.XPath($"/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[{index}]/td[1]/input"));
                             }
                             index++;
                         }
-
                     }
-                    if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0);  }
-                    radio.Click();
-                    btnOnay.Click();
-                    WaitForPageLoaded(out msg);
-                    if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0);  }
-                    radio = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[1]/tbody/tr[3]/td[1]/input"));
-                    btnOnay = Surucu.Driver.FindElement(By.XPath("/html/body/table[2]/tbody/tr/td[2]/form/table[2]/tbody/tr/td/input[1]"));
+
+                    if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
                     radio.Click();
                     btnOnay.Click();
 
-                    if (Surucu.Driver.PageSource.Replace("  "," ").Contains("Raporun Odemesi Yapilmis,Onay Iptal Edilemez!") || Surucu.Driver.PageSource.Replace("  "," ").Contains("Ödeme yapıldığı için işlem yapamazsınız!"))
+                    WaitForPageLoaded(out msg);
+                    if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
+
+                    // KRİTİK İYİLEŞTİRME: Sayfa yüklendikten sonra elementler DOM'da tazece yeniden aranıyor (StaleElement önlemi)
+                    radio = WaitForElement(radioLocator);
+                    btnOnay = WaitForElement(btnOnayLocator);
+
+                    radio.Click();
+                    btnOnay.Click();
+
+                    // Sayfa kaynağındaki çift boşluklar temizlenerek kontrol sağlanıyor
+                    string pageSource = Surucu.Driver.PageSource.Replace("  ", " ");
+                    if (pageSource.Contains("Raporun Odemesi Yapilmis,Onay Iptal Edilemez!") || pageSource.Contains("Ödeme yapıldığı için işlem yapamazsınız!"))
                     {
-                        if (GlobalVars.CancelProcess == true) { return ("iptal", RgvTitleText, 0);  }
+                        if (GlobalVars.CancelProcess) return ("iptal", RgvTitleText, 0);
                         Message = "Raporun Ödemesi Yapılmış, Onay İptal Edilemez!";
                         ur.Rslt = "Raporun ödemesi yapılmış, onay iptal edilemez!";
                     }
@@ -1031,13 +1179,14 @@ namespace SGKServices
                 msg = ex.Message.ToString();
                 Message = $"Rapor iptal etme işlemi tamamlanamadı. Hata: {msg}";
             }
+
             RgvTitleText = "Rapor iptal etme işlemi tamamlandı";
             return (Message, RgvTitleText, cancelled);
         }
         #endregion
 
         #region yardimcimetotlar 
-  
+
         public bool WaitForFileDl(string path)
         {
             

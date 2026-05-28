@@ -78,31 +78,17 @@ namespace Models.Domain
             int step = 1000;
             try
             {
-                PdfReader reader = new PdfReader(path);  //new PdfReader(InputFileFullPath(filePdf));
-                                                         //   SimpleTextExtractionStrategy strategy;
-                step = 2000;
-                for (int i = 1; i <= reader.NumberOfPages; i++)
+                using (PdfReader reader = new PdfReader(path))
                 {
-                    step = 2000 + i;
-                    String text = PdfTextExtractor.GetTextFromPage(reader, i);
-                    step = 20000 + i;
-                    processed.Append(text + "\n");
+                    step = 2000;
+                    for (int i = 1; i <= reader.NumberOfPages; i++)
+                    {
+                        step = 2000 + i;
+                        String text = PdfTextExtractor.GetTextFromPage(reader, i);
+                        step = 20000 + i;
+                        processed.Append(text + "\n");
+                    }
                 }
-
-
-
-                //var pdfDocument = new iText.Kernel.Pdf.PdfDocument(new PdfReader(path));
-                //StringBuilder processed = new StringBuilder();
-
-                //string text = "";
-
-                //for (int i = 1; i <= pdfDocument.GetNumberOfPages(); ++i)
-                //{
-                //    ITextExtractionStrategy strategy = new LocationTextExtractionStrategy();
-                //    PdfPage page = pdfDocument.GetPage(i);
-                //    text = PdfTextExtractor.GetTextFromPage(page, strategy);
-                //    processed.Append(text + "\n");
-                //}
                 return processed.ToString();
             }
             catch (Exception ex)

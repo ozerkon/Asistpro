@@ -45,11 +45,11 @@ namespace SgkAssistant.Forms.Common
         }
         private void TempEnc()
         {
-            Settings.Default.mschostR = Encrypt.DecryptString(Settings.Default.mschostR, GlobalVars.PassPhrase);
-            Settings.Default.mscuidR = Encrypt.DecryptString(Settings.Default.mscuidR, GlobalVars.PassPhrase);
-            Settings.Default.mscupR = Encrypt.DecryptString(Settings.Default.mscupR, GlobalVars.PassPhrase);
-            Settings.Default.mscdbR = Encrypt.DecryptString(Settings.Default.mscdbR, GlobalVars.PassPhrase);
-            Settings.Default.mscprtR = Encrypt.DecryptString(Settings.Default.mscprtR, GlobalVars.PassPhrase);
+            Settings.Default.mschostR = Encrypt.EncryptString(Settings.Default.mschostR, GlobalVars.PassPhrase);
+            Settings.Default.mscuidR = Encrypt.EncryptString(Settings.Default.mscuidR, GlobalVars.PassPhrase);
+            Settings.Default.mscupR = Encrypt.EncryptString(Settings.Default.mscupR, GlobalVars.PassPhrase);
+            Settings.Default.mscdbR = Encrypt.EncryptString(Settings.Default.mscdbR, GlobalVars.PassPhrase);
+            Settings.Default.mscprtR = Encrypt.EncryptString(Settings.Default.mscprtR, GlobalVars.PassPhrase);
 
             Settings.Default.mschostL = Encrypt.DecryptString(Settings.Default.mschostL, GlobalVars.PassPhrase);
             Settings.Default.mscuidL = Encrypt.DecryptString(Settings.Default.mscuidL, GlobalVars.PassPhrase);

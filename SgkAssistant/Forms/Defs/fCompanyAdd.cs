@@ -74,32 +74,54 @@ namespace SgkAssistant.Forms.Defs
             bgw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(BgwComplated);
             bgw.ProgressChanged += new ProgressChangedEventHandler(BgwChanged);
         }
-        
+
         private void BgwDoWork(object sender, DoWorkEventArgs e)
         {
-            string msg ; 
-            mccReach = false; 
-            lblMessage.Text = string.Empty; 
-            hasUpdate = false; hasError = false; 
-            btnReport.Enabled = false;
+            string msg = "";
+            mccReach = false;
+            hasUpdate = false;
+            hasError = false;
             addCompaniesReport = "";
-            foreach (GridViewRowInfo row in rgvCompanyFromExcel.Rows)
-            {
 
-                login = new Company();
-                login.CompanyName = row.Cells[0].Value.ToString().Trim();
-                login.CompanyId = row.Cells[1].Value.ToString().Trim();
-                login.CompanyId2 = row.Cells[2].Value.ToString().Trim();
-                login.SystemPassword = row.Cells[3].Value.ToString().Trim();
-                login.CompanyPassword = row.Cells[4].Value.ToString().Trim();
-                login.Gun = row.Cells[5].Value.ToString().Trim();
-                login.Gp = row.Cells[6].Value.ToString().Trim();
-                login.Gs = row.Cells[7].Value.ToString().Trim();
-                login.Sc1 = row.Cells[8].Value.ToString().Trim();
-                login.Sc2 = row.Cells[9].Value.ToString().Trim();
-                login.Sc3 = row.Cells[10].Value.ToString().Trim();
-                login.Sc4 = row.Cells[11].Value.ToString().Trim();
-                login.Sc5 = row.Cells[12].Value.ToString().Trim();
+            // Ana UI elementlerini güvenli bir şekilde sıfırlıyoruz
+            Invoke((Action)(() =>
+            {
+                lblMessage.Text = string.Empty;
+                btnReport.Enabled = false;
+            }));
+
+            // Cross-thread hatası almamak için Excel grid verilerini güvenli bir listeye kopyalıyoruz
+            List<Company> ExcelCompaniesList = new List<Company>();
+            Invoke((Action)(() =>
+            {
+                foreach (GridViewRowInfo row in rgvCompanyFromExcel.Rows)
+                {
+                    if (row.Cells[0].Value == null) continue;
+
+                    Company c = new Company
+                    {
+                        CompanyName = row.Cells[0].Value?.ToString().Trim() ?? "",
+                        CompanyId = row.Cells[1].Value?.ToString().Trim() ?? "",
+                        CompanyId2 = row.Cells[2].Value?.ToString().Trim() ?? "",
+                        SystemPassword = row.Cells[3].Value?.ToString().Trim() ?? "",
+                        CompanyPassword = row.Cells[4].Value?.ToString().Trim() ?? "",
+                        Gun = row.Cells[5].Value?.ToString().Trim() ?? "",
+                        Gp = row.Cells[6].Value?.ToString().Trim() ?? "",
+                        Gs = row.Cells[7].Value?.ToString().Trim() ?? "",
+                        Sc1 = row.Cells[8].Value?.ToString().Trim() ?? "",
+                        Sc2 = row.Cells[9].Value?.ToString().Trim() ?? "",
+                        Sc3 = row.Cells[10].Value?.ToString().Trim() ?? "",
+                        Sc4 = row.Cells[11].Value?.ToString().Trim() ?? "",
+                        Sc5 = row.Cells[12].Value?.ToString().Trim() ?? ""
+                    };
+                    ExcelCompaniesList.Add(c);
+                }
+            }));
+
+            // Artık tamamen bellek üzerinden (UI'dan bağımsız) döngüyü güvenle çalıştırabiliriz
+            foreach (Company currentLogin in ExcelCompaniesList)
+            {
+                login = currentLogin;
                 IOC.SgkLinksService.SetSgkLoginCredentials(login);
 
                 int counter = 1;
@@ -108,24 +130,30 @@ namespace SgkAssistant.Forms.Defs
                     LinkGlobals.LstLinks = IOC.LinksDataService.GetAllLinks(out msg);
                     if (LinkGlobals.LstLinks != null) { break; }
                     counter++;
-                    if (counter == 3) { Invoke((Action)(() => { lblMessage.Text = "Veri tabanı hatası, lütfen daha sonra tekrar deneyin."; })); return; }
+                    if (counter == 3)
+                    {
+                        Invoke((Action)(() => { lblMessage.Text = "Veri tabanı hatası, lütfen daha sonra tekrar deneyin."; }));
+                        return;
+                    }
                 }
+
                 IOC.LinkOps.CmdUrlVurl = LinkGlobals.LstLinks.Where(x => x.Id == 20).Select(x => new CmdUrlVurl { Cmd = x.Cmd, Url = x.Url, Vurl = x.Vurl }).FirstOrDefault();
-                IOC.SgkLinksService.Command = IOC.LinkOps.CmdUrlVurl.Cmd;
-                IOC.SgkLinksService.Vurl = IOC.LinkOps.CmdUrlVurl.Vurl;
-                IOC.SgkLinksService.Url = IOC.LinkOps.CmdUrlVurl.Url;
+                IOC.SgkLinksService.Command = IOC.LinkOps.CmdUrlVurl?.Cmd;
+                IOC.SgkLinksService.Vurl = IOC.LinkOps.CmdUrlVurl?.Vurl;
+                IOC.SgkLinksService.Url = IOC.LinkOps.CmdUrlVurl?.Url;
                 List<Company> companies = new List<Company>() { login };
                 IOC.SgkLinksService.LoginBtnClicked = false;
 
                 #region getInfoForCompany
-                if (bgw.CancellationPending == true) { e.Cancel = true; return; }
+                if (bgw.CancellationPending) { e.Cancel = true; return; }
 
                 IOC.SgkLinksService.CompanyName = login.CompanyName;
                 try
                 {
                     GlobalVars.ProcessReport = "<html><ul>";
                     IOC.LinkOps.StartProcessForLinks(companies, ref acError, out msg, ref lblReport);
-                    if (msg.Contains("Oturum başlatıldı") )
+
+                    if (msg.Contains("Oturum başlatıldı"))
                     {
                         WebDriverWait wait = IOC.CommonFuncs.GetWait();
                         System.Threading.Thread.CurrentThread.CurrentCulture = GlobalVars.SetCulture();
@@ -134,36 +162,41 @@ namespace SgkAssistant.Forms.Defs
                         Invoke((Action)(() =>
                         {
                             GlobalVars.ProcessReport += $"<li><span style=\"font-size: 10pt\"><strong>{login.CompanyName} adlı firmanın bilgileri alınıyor</strong></span></li>";
-                            lblReport.Text = GlobalVars.ProcessReport; 
+                            lblReport.Text = GlobalVars.ProcessReport;
                         }));
+
                         login.Sgsc = "";
                         counter = 1;
                         while (login.Sgsc == "")
                         {
-                            IWebElement table = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table")));
+                            // Selenium 4 Modern Lambda Bekleme Yapısı
+                            IWebElement table = wait.Until(d => d.FindElement(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table")));
                             List<IWebElement> trs = table.FindElements(By.TagName("tr")).ToList();
 
-                            IWebElement weSgsc = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[1]/td[3]")));
-                            if (bgw.CancellationPending == true) { e.Cancel = true; return; }
-                            IWebElement weUnvan = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[3]")));
-                            if (bgw.CancellationPending == true) { e.Cancel = true; return; }
+                            IWebElement weSgsc = wait.Until(d => d.FindElement(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[1]/td[3]")));
+                            if (bgw.CancellationPending) { e.Cancel = true; return; }
+                            IWebElement weUnvan = wait.Until(d => d.FindElement(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[3]")));
+                            if (bgw.CancellationPending) { e.Cancel = true; return; }
+
                             int rowCount = 7; string weAraciText = "";
                             if (trs.Count == 8)
                             {
                                 rowCount = 8;
-                                IWebElement weAraci = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[3]")));
+                                IWebElement weAraci = wait.Until(d => d.FindElement(By.XPath("//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[3]/td[3]")));
                                 weAraciText = weUnvan.Text.Trim();
                             }
-                            IWebElement weAdres = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 4}]/td[3]")));
-                            if (bgw.CancellationPending == true) { e.Cancel = true; return; }
-                            IWebElement weBosgm = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 3}]/td[3]")));
-                            if (bgw.CancellationPending == true) { e.Cancel = true; return; }
-                            IWebElement weKka = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 2}]/td[3]")));
-                            if (bgw.CancellationPending == true) { e.Cancel = true; return; }
-                            IWebElement weKkc = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 1}]/td[3]")));
-                            if (bgw.CancellationPending == true) { e.Cancel = true; return; }
+                            IWebElement weAdres = wait.Until(d => d.FindElement(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 4}]/td[3]")));
+                            if (bgw.CancellationPending) { e.Cancel = true; return; }
+                            IWebElement weBosgm = wait.Until(d => d.FindElement(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 3}]/td[3]")));
+                            if (bgw.CancellationPending) { e.Cancel = true; return; }
+                            IWebElement weKka = wait.Until(d => d.FindElement(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 2}]/td[3]")));
+                            if (bgw.CancellationPending) { e.Cancel = true; return; }
+                            IWebElement weKkc = wait.Until(d => d.FindElement(By.XPath($"//*[@id='isyeriBilgileri']/td/table/tbody/tr[2]/td[2]/table/tbody/tr[{rowCount - 1}]/td[3]")));
+                            if (bgw.CancellationPending) { e.Cancel = true; return; }
 
-                            login.Sgsc = IOC.LinkOps.GetElementText(weSgsc).Trim().Replace(" ", "").Replace("-", ""); if (login.Sgsc != "") { isSgscOk = true; }
+                            login.Sgsc = IOC.LinkOps.GetElementText(weSgsc).Trim().Replace(" ", "").Replace("-", "");
+                            if (login.Sgsc != "") { isSgscOk = true; }
+
                             login.Unvan = IOC.LinkOps.GetElementText(weUnvan).Trim();
                             if (rowCount == 8)
                             {
@@ -171,28 +204,32 @@ namespace SgkAssistant.Forms.Defs
                             }
                             login.Adres = IOC.LinkOps.GetElementText(weAdres).Trim();
                             login.Sgm = IOC.LinkOps.GetElementText(weBosgm).Trim();
-                            int gun = Convert.ToInt32(IOC.LinkOps.GetElementText(weKka).Trim().Substring(0, 2));
-                            int ay = Convert.ToInt32(IOC.LinkOps.GetElementText(weKka).Trim().Substring(3, 2));
-                            int yil = Convert.ToInt32(IOC.LinkOps.GetElementText(weKka).Trim().Substring(6, 4));
+
+                            string kkaText = IOC.LinkOps.GetElementText(weKka).Trim();
+                            int gun = Convert.ToInt32(kkaText.Substring(0, 2));
+                            int ay = Convert.ToInt32(kkaText.Substring(3, 2));
+                            int yil = Convert.ToInt32(kkaText.Substring(6, 4));
                             login.Kka = new DateTime(yil, ay, gun);
-                            if (IOC.LinkOps.GetElementText(weKkc).Trim() != string.Empty)
+
+                            string kkcText = IOC.LinkOps.GetElementText(weKkc).Trim();
+                            if (!string.IsNullOrEmpty(kkcText))
                             {
-                                gun = Convert.ToInt32(IOC.LinkOps.GetElementText(weKkc).Trim().Substring(0, 2)); //  15/03/2014
-                                ay = Convert.ToInt32(IOC.LinkOps.GetElementText(weKkc).Trim().Substring(3, 2));
-                                yil = Convert.ToInt32(IOC.LinkOps.GetElementText(weKkc).Trim().Substring(6, 4));
-                                login.Kkc = DateTime.Parse(IOC.LinkOps.GetElementText(weKkc).Trim());
+                                login.Kkc = DateTime.Parse(kkcText);
                             }
                             else
                             {
                                 login.Kkc = new DateTime(8923, 10, 29, 0, 0, 0);
                             }
-                            counter++; Thread.Sleep(100);
+
+                            counter++;
+                            Thread.Sleep(100);
                             if (counter == 60) { e.Cancel = true; isSgscOk = false; return; }
                         }
+
                         #region setFm
                         dc = IOC.CompanyDataService.GetCompanyCenters(out msg);
                         Company tempC = IOC.CompanyDataService.GetCompanyBySgkIds(login.CompanyId, login.CompanyId2, out msg);
-                        if (tempC != null && tempC.CompanyName != string.Empty)
+                        if (tempC != null && !string.IsNullOrEmpty(tempC.CompanyName))
                         {
                             login.Fm = tempC.Fm;
                         }
@@ -200,17 +237,17 @@ namespace SgkAssistant.Forms.Defs
                         {
                             if (dc != null && dc.Count > 0)
                             {
-
                                 foreach (var item in dc)
                                 {
-                                    if (bgw.CancellationPending == true) { e.Cancel = true; return; }
+                                    if (bgw.CancellationPending) { e.Cancel = true; return; }
                                     Company compFm = new Company();
                                     int id = item.Value;
                                     lastId = IOC.CompanyDataService.GetLastId(out msg);
                                     compFm = IOC.CompanyDataService.GetCompanyById(id, out msg);
                                     if (login.Gun == compFm.Gun)
                                     {
-                                        login.Fm = compFm.Id; break;
+                                        login.Fm = compFm.Id;
+                                        break;
                                     }
                                     else
                                     {
@@ -220,45 +257,64 @@ namespace SgkAssistant.Forms.Defs
                             }
                         }
                         #endregion
+
                         int sonuc = IOC.CompanyDataService.AddCompany(login, PackageHelper.Mcc, out msg);
 
-                        if (sonuc == 0)
+                        Invoke((Action)(() =>
                         {
-                            GlobalVars.ProcessReport += $"<li><span style=\"font-size: 10pt: color: red\"><strong>{login.CompanyName}, eklenemedi, lütfen bilgileri kontrol edip tekrar deneyin</strong></span></li></ul></html>";
-                            lblReport.Text = GlobalVars.ProcessReport;
-                            addCompaniesReport += GlobalVars.ProcessReport; lblReport.Text = "<html><ul>"; GlobalVars.ProcessReport = lblReport.Text; 
-                            hasError = true;
-                        }
-                        else if (sonuc == 1)
-                        {
-                            GlobalVars.ProcessReport += $"<li><span style=\"font-size: 10pt; color: DarkGreen\"><strong>{login.CompanyName}, eklendi</strong></span></li></ul></html>"; added++;
-                            IOC.WinHelpers.AddSgscEnc(login.Sgsc, out msg);
-                            lblReport.Text = GlobalVars.ProcessReport;
-                            addCompaniesReport += GlobalVars.ProcessReport; lblReport.Text = "<html><ul>"; GlobalVars.ProcessReport = lblReport.Text;
-                        }
-                        else if (sonuc == 2)
-                        {
-                            GlobalVars.ProcessReport += $"<li><span style=\"font-size: 10pt; color: DarkGreen\"><strong>{login.Sgsc}, sicil numaralı firmanın bilgileri güncellendi</strong></span></li></ul></html>"; hasUpdate = true; updated++;
-                            lblReport.Text = GlobalVars.ProcessReport;
-                            addCompaniesReport += GlobalVars.ProcessReport; lblReport.Text = "<html><ul>"; GlobalVars.ProcessReport = lblReport.Text;
-                        }
-                        else if (sonuc == 3)
-                        {
-                            GlobalVars.ProcessReport += $"<li><span style=\"font-size: 10pt; color: red\"><strong>Satın aldığınız paketteki firma ekleme limitine ({PackageHelper.Mcc}) ulaştınız.</strong></span></li></ul></html>"; mccReach = true;
-                            lblReport.Text = GlobalVars.ProcessReport;
-                            addCompaniesReport += GlobalVars.ProcessReport; lblReport.Text = "<html><ul>"; GlobalVars.ProcessReport = lblReport.Text;
-                            break;
-                        }
-                        IOC.LinkOps.LogOut("x", "//*[@id='navigation']/li[5]", "İŞVEREN SİSTEMİ", out msg);
-                        if (bgw.CancellationPending == true) { e.Cancel = true; return; }
+                            if (sonuc == 0)
+                            {
+                                GlobalVars.ProcessReport += $"<li><span style=\"font-size: 10pt; color: red\"><strong>{login.CompanyName}, eklenemedi, lütfen bilgileri kontrol edip tekrar deneyin</strong></span></li></ul></html>";
+                                lblReport.Text = GlobalVars.ProcessReport;
+                                addCompaniesReport += GlobalVars.ProcessReport;
+                                lblReport.Text = "<html><ul>";
+                                GlobalVars.ProcessReport = lblReport.Text;
+                                hasError = true;
+                            }
+                            else if (sonuc == 1)
+                            {
+                                GlobalVars.ProcessReport += $"<li><span style=\"font-size: 10pt; color: DarkGreen\"><strong>{login.CompanyName}, eklendi</strong></span></li></ul></html>";
+                                added++;
+                                IOC.WinHelpers.AddSgscEnc(login.Sgsc, out msg);
+                                lblReport.Text = GlobalVars.ProcessReport;
+                                addCompaniesReport += GlobalVars.ProcessReport;
+                                lblReport.Text = "<html><ul>";
+                                GlobalVars.ProcessReport = lblReport.Text;
+                            }
+                            else if (sonuc == 2)
+                            {
+                                GlobalVars.ProcessReport += $"<li><span style=\"font-size: 10pt; color: DarkGreen\"><strong>{login.Sgsc}, sicil numaralı firmanın bilgileri güncellendi</strong></span></li></ul></html>";
+                                hasUpdate = true;
+                                updated++;
+                                lblReport.Text = GlobalVars.ProcessReport;
+                                addCompaniesReport += GlobalVars.ProcessReport;
+                                lblReport.Text = "<html><ul>";
+                                GlobalVars.ProcessReport = lblReport.Text;
+                            }
+                            else if (sonuc == 3)
+                            {
+                                GlobalVars.ProcessReport += $"<li><span style=\"font-size: 10pt; color: red\"><strong>Satın aldığınız paketteki firma ekleme limitine ({PackageHelper.Mcc}) ulaştınız.</strong></span></li></ul></html>";
+                                mccReach = true;
+                                lblReport.Text = GlobalVars.ProcessReport;
+                                addCompaniesReport += GlobalVars.ProcessReport;
+                                lblReport.Text = "<html><ul>";
+                                GlobalVars.ProcessReport = lblReport.Text;
+                            }
+                        }));
 
+                        if (sonuc == 3) break; // Limite ulaşıldıysa döngüden çık
+
+                        IOC.LinkOps.LogOut("x", "//*[@id='navigation']/li[5]", "İŞVEREN SİSTEMİ", out msg);
+                        if (bgw.CancellationPending) { e.Cancel = true; return; }
                     }
-                    else if (msg.Contains("iptal")) {
+                    else if (msg.Contains("iptal"))
+                    {
                         Invoke((Action)(() =>
                         {
                             GlobalVars.ProcessReport += $"<li><span style=\"font-size: 10pt; color: red\"><strong>Firma ekleme işlemi iptal edildi</strong></span></li></ul></html>";
                         }));
-                        e.Cancel = true; return; 
+                        e.Cancel = true;
+                        return;
                     }
                     else if (msg == "continue" || msg.Contains("Hata"))
                     {
@@ -266,8 +322,11 @@ namespace SgkAssistant.Forms.Defs
                         Invoke((Action)(() =>
                         {
                             lblReport.Text = GlobalVars.ProcessReport;
+                            addCompaniesReport += GlobalVars.ProcessReport;
+                            lblReport.Text = "<html><ul>";
+                            GlobalVars.ProcessReport = lblReport.Text;
                         }));
-                        addCompaniesReport += GlobalVars.ProcessReport; lblReport.Text = "<html><ul>"; GlobalVars.ProcessReport = lblReport.Text; continue;
+                        continue;
                     }
                     else if (msg == "continueGoAhead")
                     {
@@ -275,16 +334,19 @@ namespace SgkAssistant.Forms.Defs
                         Invoke((Action)(() =>
                         {
                             lblReport.Text = GlobalVars.ProcessReport;
+                            addCompaniesReport += GlobalVars.ProcessReport;
+                            lblReport.Text = "<html><ul>";
+                            GlobalVars.ProcessReport = lblReport.Text;
                         }));
-                        addCompaniesReport += GlobalVars.ProcessReport; lblReport.Text = "<html><ul>"; GlobalVars.ProcessReport = lblReport.Text; continue;
+                        continue;
                     }
                 }
                 catch (Exception ex)
                 {
-                    msg = ex.Message.ToString();
+                    msg = ex.Message;
                 }
-                if (bgw.CancellationPending == true) { e.Cancel = true; return; }
-                
+
+                if (bgw.CancellationPending) { e.Cancel = true; return; }
                 #endregion
             }
         }

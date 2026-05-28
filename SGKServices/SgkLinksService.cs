@@ -2,7 +2,6 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
 using SGKServices.Captcha;
 using System;
 using System.Collections.Generic;
@@ -260,22 +259,40 @@ namespace SGKServices
             try
             {
                 WebDriverWait wait = new WebDriverWait(Surucu.Driver, TimeSpan.FromSeconds(10));
-                IAlert alert1 =  wait.Until(ExpectedConditions.AlertIsPresent());
-                
-                if(alert1 != null)
+
+                // ExpectedConditions yerine modern lambda kullanımı
+                IAlert alert = wait.Until(d =>
                 {
-                    IAlert alert = Surucu.Driver.SwitchTo().Alert();
-                    alert.Accept();
+                    try
+                    {
+                        // Alerte geçiş yapmayı dene. Başarılı olursa alert nesnesini döndür (ve beklemeyi bitir).
+                        return d.SwitchTo().Alert();
+                    }
+                    catch (NoAlertPresentException)
+                    {
+                        // Henüz alert yoksa null döndür ki süre (10sn) dolana kadar denemeye devam etsin.
+                        return null;
+                    }
+                });
+
+                if (alert != null)
+                {
+                    alert.Accept(); // Alerti onayla (Tamam'a bas)
                     return true;
                 }
-                return false;    
-                
+                return false;
             }
-            catch (NoAlertPresentException ex)
+            catch (WebDriverTimeoutException ex) // 10 saniye içinde alert çıkmazsa bu hata fırlar
             {
-                msg = $"Alert yok {ex}"; return false;
+                msg = $"Alert bulunamadı (Zaman aşımı): {ex.Message}";
+                return false;
             }
-        }   
+            catch (Exception ex)
+            {
+                msg = $"Beklenmeyen hata: {ex.Message}";
+                return false;
+            }
+        }
         public bool GetCaptchaPicture(string t, string tv, out string msg)
         {
             tryCount = 0;
@@ -400,29 +417,32 @@ namespace SGKServices
         }
         public IWebElement GetButtonElementBy(string t, string tv, out string msg)
         {
-            msg = ""; 
+            msg = "";
             try
             {
                 WebDriverWait wait = GetWait();
                 if (!ExecuteScript(t, tv)) { wait.Until(e => ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript("return document.readyState").Equals("complete")); }
                 if (GlobalVars.CancelProcess || LinkGlobals.LinkCancel) { msg = "iptal"; return null; }
+
+                // 1. Önce Hangi Seçiciyi (Locator) Kullanacağımızı Belirliyoruz
+                By locator = null;
                 switch (t)
                 {
-                    case "n":
-                        Element = wait.Until(ExpectedConditions.ElementToBeClickable(By.Name(tv)));
-                        break;
-                    case "i":
-                        Element = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id(tv)));
-                        break;
-                    case "x":
-                        Element = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath(tv)));
-                        break;
-                    case "c":
-                        Element = wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector(tv)));
-                        break;
-                    case "t":
-                        Element = wait.Until(ExpectedConditions.ElementToBeClickable(By.LinkText(tv)));
-                        break;
+                    case "n": locator = By.Name(tv); break;
+                    case "i": locator = By.Id(tv); break;
+                    case "x": locator = By.XPath(tv); break;
+                    case "c": locator = By.CssSelector(tv); break;
+                    case "t": locator = By.LinkText(tv); break;
+                }
+
+                if (locator != null)
+                {
+                    // 2. Elementin var olmasını, görünür (Displayed) ve tıklanabilir (Enabled) olmasını bekliyoruz
+                    Element = wait.Until(d =>
+                    {
+                        var el = d.FindElement(locator);
+                        return (el != null && el.Displayed && el.Enabled) ? el : null;
+                    });
                 }
             }
             catch (Exception ex)
@@ -708,8 +728,8 @@ namespace SGKServices
             bool hasLoaded = false; bool clicked = false; int continueWaiting = 1;
             bool isverenSistemi = Command.Contains("https://uyg.sgk.gov.tr/IsverenSistemi") || Command.Contains("İŞVEREN") ? true : false;
             WebDriverWait wait = GetWait();
-            string komut = Command.IndexOf("alg") > 1 ? Command.Substring( Command.IndexOf("alg") +3 ).Trim() : Command.Trim();
-            if(!GlobalVars.IsCompanyActive && GlobalVars.HesapTypeEtDbCr)  komut =  Command.Substring(Command.IndexOf("lck")) ; 
+            string komut = Command.IndexOf("alg") > 1 ? Command.Substring(Command.IndexOf("alg") + 3).Trim() : Command.Trim();
+            if (!GlobalVars.IsCompanyActive && GlobalVars.HesapTypeEtDbCr) komut = Command.Substring(Command.IndexOf("lck"));
             StringReader sr = new StringReader(komut);
             string line;
             int counter = 1;
@@ -717,21 +737,29 @@ namespace SGKServices
             {
                 while ((line = sr.ReadLine()) != null)
                 {
-                    if(GlobalVars.CancelProcess || LinkGlobals.LinkCancel) { 
-                        Message = "İşlem kullanıcı tarafından iptal edildi."; msg = "iptal"; return false; }
+                    if (GlobalVars.CancelProcess || LinkGlobals.LinkCancel)
+                    {
+                        Message = "İşlem kullanıcı tarafından iptal edildi."; msg = "iptal"; return false;
+                    }
                     string[] parts = line.Split(' ');
                     switch (parts[0])
                     {
                         case "clk":
-                            if(parts[1].Remove(0, 2) == "t")
+                            if (parts[1].Remove(0, 2) == "t")
                             {
                                 Element = GetButtonElementBy(parts[1].Remove(0, 2), line.Remove(0, 11), out msg);
                             }
                             else
                             {
-                                Element = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath(parts[2].Remove(0, 3))));
+                                // ESKİ KOD: Element = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath(parts[2].Remove(0, 3))));
+                                // YENİ KOD: Elementin bulunmasını, görünür (Displayed) olmasını ve tıklanabilir (Enabled) olmasını bekliyoruz.
+                                Element = wait.Until(d =>
+                                {
+                                    var el = d.FindElement(By.XPath(parts[2].Remove(0, 3)));
+                                    return (el != null && el.Displayed && el.Enabled) ? el : null;
+                                });
                             }
-                            if(LinkGlobals.Ivd == true)
+                            if (LinkGlobals.Ivd == true)
                             {
 
                                 ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript($"document.getElementById(\"{parts[2].Remove(0, 3)}\").parentElement.setAttribute(\"style\", \"display:block\");");
@@ -739,15 +767,17 @@ namespace SGKServices
 
                                 ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript("arguments[0].scrollIntoView(true); ", Element);
                             }
-                            if(Element == null) {
-                                Message = $"Oturum açma işleminden sonra devam edilemiyor. Hata: {msg}"; msg = "yeniden"; return false; }
+                            if (Element == null)
+                            {
+                                Message = $"Oturum açma işleminden sonra devam edilemiyor. Hata: {msg}"; msg = "yeniden"; return false;
+                            }
                             hasLoaded = false; clicked = false; continueWaiting = 1;
                             while (!hasLoaded)
                             {
                                 try
                                 {
-                                    if(!clicked) { Element.Click(); clicked = true; }
-                                    if(LinkGlobals.LinkCancel == true) { Message = "İşlem kullanıcı tarafından iptal edildi."; msg = "iptal"; return false; }
+                                    if (!clicked) { Element.Click(); clicked = true; }
+                                    if (LinkGlobals.LinkCancel == true) { Message = "İşlem kullanıcı tarafından iptal edildi."; msg = "iptal"; return false; }
                                     while (continueWaiting > 1)
                                     {
                                         IsElementEXISTS(By.TagName("body"));
@@ -757,7 +787,7 @@ namespace SGKServices
                                 catch (WebDriverException)
                                 {
                                     continueWaiting++;
-                                    if(continueWaiting >= 3)
+                                    if (continueWaiting >= 3)
                                     {
                                         msg = "yeniden";
                                         Message = "Sayfa yüklenmesi çok uzun sürdüğü için işlem iptal edildi.";
@@ -765,17 +795,17 @@ namespace SGKServices
                                     }
                                 }
                             }
-                            if(LinkGlobals.Ivd == true)
+                            if (LinkGlobals.Ivd == true)
                             {
                                 ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript($"document.getElementById(\"{parts[2].Remove(0, 3)}\").parentElement.removeAttribute(\"style\");");
                                 ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript($"document.getElementById(\"{parts[2].Remove(0, 3)}\").parentElement.parentElement.parentElement.removeAttribute(\"style\");");
                             }
                             break;
                         case "omo":
-                            JustMouseHover(parts[1].Remove(0, 2), parts[2].Remove(0,3), out msg);
+                            JustMouseHover(parts[1].Remove(0, 2), parts[2].Remove(0, 3), out msg);
                             break;
                         case "hnd":
-                            if(parts[1] == "2" || parts[1] == "t")
+                            if (parts[1] == "2" || parts[1] == "t")
                             {
                                 Surucu.Driver.SwitchTo().Window(Surucu.Driver.WindowHandles[0]);
                                 Actions action = new Actions(Surucu.Driver);
@@ -785,44 +815,45 @@ namespace SGKServices
                                 List<string> handle = Surucu.Driver.WindowHandles.ToList();
                                 for (int i = 0; i < handle.Count; i++)
                                 {
-                                    if(!handle[i].Equals(Surucu.Driver.WindowHandles[0]))
+                                    if (!handle[i].Equals(Surucu.Driver.WindowHandles[0]))
                                     {
                                         Surucu.Driver.SwitchTo().Window(handle[i]);
                                     }
                                 }
                             }
-                            else if(parts[1] == "l"){
+                            else if (parts[1] == "l")
+                            {
                                 Surucu.Driver.SwitchTo().Window(Surucu.Driver.WindowHandles.Last());
                             }
                             break;
                         case "stf":
                             int say = 1;
-                            while (say <= 3 )
+                            while (say <= 3)
                             {
-                                if(LinkGlobals.LinkCancel == true) { Message = "İşlem kullanıcı tarafından iptal edildi."; msg = "iptal"; return false; }
+                                if (LinkGlobals.LinkCancel == true) { Message = "İşlem kullanıcı tarafından iptal edildi."; msg = "iptal"; return false; }
                                 try
                                 {
-                                    Surucu.Driver.SwitchTo().Frame(parts[1]); 
+                                    Surucu.Driver.SwitchTo().Frame(parts[1]);
                                     break;
                                 }
                                 catch (WebDriverException)
                                 {
                                     say++;
-                                    if(say >= 3)
+                                    if (say >= 3)
                                     {
                                         msg = "yeniden";
                                         Message = "Sayfa yüklenmesi çok uzun sürdüğü için işlem iptal edildi.";
                                         return false;
                                     }
                                 }
-                                
+
                             }
                             break;
                         case "bck":
-                            
+
                             try
                             {
-                                if(counter < 11 || Command.Contains("https://uyg.sgk.gov.tr/EBorcuYoktur5510/amp/loginldap") || Command.Contains("https://ivd.gib.gov.tr")) { continue; } // counter 11 ?
+                                if (counter < 11 || Command.Contains("https://uyg.sgk.gov.tr/EBorcuYoktur5510/amp/loginldap") || Command.Contains("https://ivd.gib.gov.tr")) { continue; } // counter 11 ?
                                 else
                                 {
                                     Element = GetElementBy(parts[1].Remove(0, 2), parts[2].Remove(0, 3), out msg);
@@ -831,24 +862,24 @@ namespace SGKServices
                             }
                             catch (WebDriverException)
                             {
-                                Message = $"Oturum açma işleminden sonra devam edilemiyor. Hata: {msg}"; 
+                                Message = $"Oturum açma işleminden sonra devam edilemiyor. Hata: {msg}";
                                 msg = "yeniden";  // sayfayı yeniletsek ne olur!!!
                                 return false;
                             }
                             break;
                         case "lne":
-                            if(Surucu.Driver.PageSource.Replace("  "," ").Contains("Yazmış olduğunuz")) { Message = msg = "Geçersiz kimlik numarası"; return false; }
-                            if(Surucu.Driver.PageSource.Replace("  "," ").Contains("HATA BİLDİRİM")) { Message = msg = "HATA BİLDİRİM"; return false; }
-                            if(Surucu.Driver.PageSource.Replace("  "," ").Contains("4a kaydı")) { Message = msg = "Sigortalının 4a kaydı bulunamamıştır"; return false; }
+                            if (Surucu.Driver.PageSource.Replace("  ", " ").Contains("Yazmış olduğunuz")) { Message = msg = "Geçersiz kimlik numarası"; return false; }
+                            if (Surucu.Driver.PageSource.Replace("  ", " ").Contains("HATA BİLDİRİM")) { Message = msg = "HATA BİLDİRİM"; return false; }
+                            if (Surucu.Driver.PageSource.Replace("  ", " ").Contains("4a kaydı")) { Message = msg = "Sigortalının 4a kaydı bulunamamıştır"; return false; }
                             break;
                         case "lck":
                             hasLoaded = false; continueWaiting = 1;
                             while (!hasLoaded && continueWaiting < 4)
                             {
-                                if(LinkGlobals.LinkCancel == true) { Message = "İşlem kullanıcı tarafından iptal edildi."; msg = "iptal"; return false; }
+                                if (LinkGlobals.LinkCancel == true) { Message = "İşlem kullanıcı tarafından iptal edildi."; msg = "iptal"; return false; }
                                 try
                                 {
-                                    if(IsPageLoad(line.Remove(0, 4), LinkGlobals.MaxWait))
+                                    if (IsPageLoad(line.Remove(0, 4), LinkGlobals.MaxWait))
                                     {
                                         hasLoaded = true; break;
                                     }
@@ -857,10 +888,10 @@ namespace SGKServices
                                 catch (WebDriverException)
                                 {
                                     continueWaiting++;
-                                    
+
                                 }
                             }
-                            if(continueWaiting >= 3)
+                            if (continueWaiting >= 3)
                             {
                                 msg = "yeniden";
                                 Message = "Sayfa yüklenmesi çok uzun sürdüğü için işlem iptal edildi.";
@@ -896,19 +927,29 @@ namespace SGKServices
         {
             msg = "";
             WebDriverWait wait = GetWait();
+
             try
             {
-                if(type == "i")
+                // 1. Önce Hangi Seçiciyi (Locator) Kullanacağımızı Belirliyoruz
+                By locator = null;
+                switch (type)
                 {
-                    wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.VisibilityOfAllElementsLocatedBy((By.Id(element))));
+                    case "i": locator = By.Id(element); break;
+                    case "x": locator = By.XPath(element); break;
+                    case "n": locator = By.Name(element); break;
                 }
-                else if(type == "x")
+
+                if (locator != null)
                 {
-                    wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.VisibilityOfAllElementsLocatedBy((By.XPath(element))));
-                }
-                else if(type == "n")
-                {
-                    wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.VisibilityOfAllElementsLocatedBy((By.Name(element))));
+                    // 2. Elementleri bul ve HEPSİNİN görünür olmasını bekle
+                    wait.Until(d =>
+                    {
+                        var elements = d.FindElements(locator);
+
+                        // Eğer en az 1 element bulunduysa VE bulunanların hepsi görünür durumdaysa listeyi döndür (işlemi onayla)
+                        // Aksi takdirde (veya hiç element yoksa) null döndür ki süre dolana kadar denemeye devam etsin
+                        return (elements.Count > 0 && elements.All(el => el.Displayed)) ? elements : null;
+                    });
                 }
             }
             catch (Exception ex)
@@ -952,31 +993,34 @@ namespace SGKServices
         {
             msg = "";
             WebDriverWait wait = GetWait();
-            IWebElement menuItem = null; 
+            IWebElement menuItem = null;
             Actions action = new Actions(Surucu.Driver);
-            
+
             try
             {
+                // 1. Önce Hangi Seçiciyi (Locator) Kullanacağımızı Belirliyoruz
+                By locator = null;
                 switch (type)
                 {
-                    case "i":
-                        menuItem = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Id(tv)));
-                        break;
-                    case "x":
-                        menuItem = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath(tv)));
-                        break;
-                    case "n":
-                        menuItem = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Name(tv)));
-                        break;
-                    case "c":
-                        menuItem = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.CssSelector(tv)));
-                        break;
-                    case "t":
-                        menuItem = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.LinkText(tv)));
-                        break;
+                    case "i": locator = By.Id(tv); break;
+                    case "x": locator = By.XPath(tv); break;
+                    case "n": locator = By.Name(tv); break;
+                    case "c": locator = By.CssSelector(tv); break;
+                    case "t": locator = By.LinkText(tv); break;
                 }
-                action.MoveToElement(menuItem).Perform();
-                Thread.Sleep(500);
+
+                if (locator != null)
+                {
+                    // 2. Elementin hem sayfada var olmasını hem de görünür (Displayed) olmasını bekliyoruz
+                    menuItem = wait.Until(d =>
+                    {
+                        var el = d.FindElement(locator);
+                        return el.Displayed ? el : null;
+                    });
+
+                    action.MoveToElement(menuItem).Perform();
+                    Thread.Sleep(500);
+                }
             }
             catch (Exception ex)
             {

@@ -974,7 +974,62 @@ namespace SgkAssistant.Helpers
         {
             msg = "";
             _driverLocation = Application.StartupPath;
-            switch (Settings.Default.browser)
+
+            bool aktifDriverYasiyor = false;
+            int aktifDriverTipi = -1; // -1: Yok/Bilinmiyor, 0: Firefox, 1: Chrome
+
+            // 1. ADIM: Halihazırda açık ve çalışan bir tarayıcı var mı kontrol et
+            if (Surucu.Driver != null)
+            {
+                try
+                {
+                    // Tarayıcıya hafif bir istek atarak gerçekten açık olup olmadığını test ediyoruz
+                    var testHandle = Surucu.Driver.CurrentWindowHandle;
+                    aktifDriverYasiyor = true;
+
+                    // Açık olan sürücünün tipini tespit et
+                    string driverName = Surucu.Driver.GetType().Name;
+                    if (driverName.Contains("Firefox"))
+                    {
+                        aktifDriverTipi = 0;
+                    }
+                    else if (driverName.Contains("Chrome"))
+                    {
+                        aktifDriverTipi = 1;
+                    }
+                }
+                catch (Exception)
+                {
+                    // Tarayıcı hafızada var ama kullanıcı pencereyi kapatmış veya çökmüş
+                    aktifDriverYasiyor = false;
+                }
+            }
+
+            int istenenBrowserTipi = Settings.Default.browser;
+
+            // 2. ADIM: Karar Mekanizması
+            if (aktifDriverYasiyor)
+            {
+                // Senaryo A: Açık olan tarayıcı ile istenen tarayıcı AYNI ise
+                if (aktifDriverTipi == istenenBrowserTipi)
+                {
+                    // Hiçbir şey yapma, zaten açık olan kararlı driver'ı doğrudan döndür
+                    return Surucu.Driver;
+                }
+                else
+                {
+                    // Senaryo B: Tarayıcı açık ama tipi FARKLI (Örn: Firefox açık ama Chrome istendi)
+                    try
+                    {
+                        Surucu.Driver.Quit(); // Eski tarayıcıyı güvenle kapat
+                    }
+                    catch { }
+                    Surucu.Driver = null; // Hafızayı sıfırla
+                }
+            }
+
+            // 3. ADIM: Yeni Tarayıcı Oluşturma (Eğer açık tarayıcı yoksa veya tipi farklıysa buraya gelir)
+            switch (istenenBrowserTipi)
             {
                 case 0:
                     SetFirefoxOptionsForDownload(hideBrowser);
@@ -983,36 +1038,31 @@ namespace SgkAssistant.Helpers
                     SetChromeOptionsForDownload(hideBrowser);
                     break;
             }
-            if(Surucu.Driver != null && !hideBrowser)IOC.LinkOps.SetWebBrowserProcess();
-            //SetAllDrivers();
+
+            // Yeni tarayıcı oluştuktan sonra Windows süreç (Process) eşleştirmesini yap
+            if (Surucu.Driver != null && !hideBrowser)
+            {
+                IOC.LinkOps.SetWebBrowserProcess();
+            }
+
             return Surucu.Driver;
         }
+
         public void SetFirefoxOptionsForDownload(bool hideBrowser)
         {
-            //IWebDriver driver;
-            FirefoxOptions firefoxOptions;
+            FirefoxOptions firefoxOptions = new FirefoxOptions();
             FirefoxProfile firefoxProfile = new FirefoxProfile();
             FirefoxDriverService fDriverService;
-            firefoxOptions = new FirefoxOptions();
-
-            ////Dictionary<string, object> browserstackOptions = new Dictionary<string, object>();
-            ////browserstackOptions.Add("resolution", "1366x768");
-
-            ////firefoxOptions.AddAdditionalOption("bstack:options", browserstackOptions);
 
             _driverLocation = Application.StartupPath;
 
-
+            // İndirme ve PDF Ayarları
             firefoxProfile.SetPreference("browser.download.dir", SearchReport.DownloadDir);
             firefoxProfile.SetPreference("browser.download.folderList", 2);
             firefoxProfile.SetPreference("browser.helperApps.neverAsk.saveToDisk", "application/pdf");
             firefoxProfile.SetPreference("plugin.scan.plid.all", false);
             firefoxProfile.SetPreference("plugin.scan.Acrobat", "99.0");
-            //firefoxProfile.SetPreference("browser.download.manager.showWhenStarting", false);
             firefoxProfile.SetPreference("pdfjs.disabled", true);
-
-            //firefoxProfile.SetPreference("browser.helperApps.alwaysAsk.force", false);
-
             firefoxProfile.SetPreference("browser.download.manager.showAlertOnComplete", false);
             firefoxProfile.SetPreference("pdfjs.enabledCache.state", false);
             firefoxProfile.DeleteAfterUse = true;
@@ -1021,40 +1071,54 @@ namespace SgkAssistant.Helpers
 
             if (hideBrowser)
             {
-                fDriverService = FirefoxDriverService.CreateDefaultService(Application.StartupPath);
-                fDriverService.HideCommandPromptWindow = true;
                 firefoxOptions.AddArgument("-headless");
                 int sw = Screen.PrimaryScreen.Bounds.Width;
-                firefoxOptions.AddArgument($"--width={sw}");
                 int sh = Screen.PrimaryScreen.Bounds.Height;
+                firefoxOptions.AddArgument($"--width={sw}");
                 firefoxOptions.AddArgument($"--height={sh}");
             }
+
             try
             {
-                _driverLocation = new DriverManager().SetUpDriver(new FirefoxConfig());
-                _driverLocation = _driverLocation.Replace(@"\geckodriver.exe", "");
-                fDriverService = FirefoxDriverService.CreateDefaultService(_driverLocation);
-                fDriverService.HideCommandPromptWindow = true;
+                // Yerleşik Selenium Manager'ı kullanmak için boş servis oluşturuyoruz (DriverManager kaldırıldı)
+                fDriverService = FirefoxDriverService.CreateDefaultService();
+                fDriverService.HideCommandPromptWindow = true; // Siyah konsol ekranını gizle
                 Surucu.Driver = new FirefoxDriver(fDriverService, firefoxOptions);
             }
-            catch
+            catch (Exception ex)
             {
-                fDriverService = FirefoxDriverService.CreateDefaultService(_driverLocation);
+                // Eğer yerleşik mekanizma hata verirse, yerel dizindeki sürücüye geri dönüyoruz
+                fDriverService = FirefoxDriverService.CreateDefaultService(Application.StartupPath);
                 fDriverService.HideCommandPromptWindow = true;
                 Surucu.Driver = new FirefoxDriver(fDriverService, firefoxOptions);
+                Console.WriteLine(ex.Message);
             }
-
         }
+
         public void SetChromeOptionsForDownload(bool hideBrowser)
         {
             string msg = "";
-            ChromeOptions chromeOptions;
+            ChromeOptions chromeOptions = new ChromeOptions();
             ChromeDriverService cDriverService;
-            chromeOptions = new ChromeOptions();
             _driverLocation = Application.StartupPath;
+
+            // 1. Çökmeleri Önleyen Temel Güvenlik Argümanları
             chromeOptions.AddExcludedArgument("enable-automation");
-            //chromeOptions.AddAdditionalCapability("useAutomationExtension", false);
-            chromeOptions.AddArguments("--disable-notifications");
+            chromeOptions.AddArgument("--remote-allow-origins=*");
+            chromeOptions.AddArgument("--disable-notifications");
+            chromeOptions.AddArgument("--disable-extensions"); // Bozuk eklentilerin yüklenip çökertmesini engeller
+            chromeOptions.AddArgument("--disable-gpu"); // Ekran kartı ivmelenmesini kapatır (Windows çakışmalarını çözer)
+
+            // 2. KRİTİK ADIM: Windows Temp klasörü yerine projenin altında özel bir profil açıyoruz.
+            // Bu sayede antivirüs ve yetki engellemelerini (scoped_dir hatasını) tamamen bypass ederiz.
+            string customProfilePath = System.IO.Path.Combine(Application.StartupPath, "ChromeOtoProfil");
+            if (!System.IO.Directory.Exists(customProfilePath))
+            {
+                System.IO.Directory.CreateDirectory(customProfilePath);
+            }
+            chromeOptions.AddArgument($"--user-data-dir={customProfilePath}");
+
+            // Profil ve İndirme Tercihleri
             chromeOptions.AddUserProfilePreference("credentials_enable_service", false);
             chromeOptions.AddUserProfilePreference("profile.password_manager_enabled", false);
             chromeOptions.AddUserProfilePreference("download.default_directory", SearchReport.DownloadDir);
@@ -1063,26 +1127,25 @@ namespace SgkAssistant.Helpers
 
             if (hideBrowser)
             {
-                chromeOptions.AddArgument("headless");
+                chromeOptions.AddArgument("--headless=new");
                 int sw = Screen.PrimaryScreen.Bounds.Width;
                 int sh = Screen.PrimaryScreen.Bounds.Height;
                 chromeOptions.AddArguments($"window-size={sw},{sh}");
             }
+
             try
             {
-                _driverLocation = new DriverManager().SetUpDriver(new ChromeConfig());
-                _driverLocation = _driverLocation.Replace(@"\chromedriver.exe", "");
-                cDriverService = ChromeDriverService.CreateDefaultService(_driverLocation);
+                cDriverService = ChromeDriverService.CreateDefaultService();
                 cDriverService.HideCommandPromptWindow = true;
                 Surucu.Driver = new ChromeDriver(cDriverService, chromeOptions);
             }
             catch (Exception ex)
             {
                 msg = ex.Message;
-                cDriverService = ChromeDriverService.CreateDefaultService(_driverLocation);
+                cDriverService = ChromeDriverService.CreateDefaultService(Application.StartupPath);
+                cDriverService.HideCommandPromptWindow = true;
                 Surucu.Driver = new ChromeDriver(cDriverService, chromeOptions);
             }
-           
         }
         private static ChromeOptions GetChromeOptions(bool headless)
         {

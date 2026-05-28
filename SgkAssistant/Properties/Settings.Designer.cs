@@ -145,7 +145,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("+rjzHzKMjV9Wh07YyS3osQ==")]
+        [global::System.Configuration.DefaultSettingValueAttribute("mysql-1ad3d050-hulusi.b.aivencloud.com")]
         public string mschostR {
             get {
                 return ((string)(this["mschostR"]));
@@ -157,7 +157,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("aAXHjzruFVJ0G95xxMPwKw==")]
+        [global::System.Configuration.DefaultSettingValueAttribute("avnadmin")]
         public string mscuidR {
             get {
                 return ((string)(this["mscuidR"]));
@@ -169,7 +169,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("hHPZSNcjVkRgcb5v7vrQqSHJD2YwuX3BJYoiUq3KiDA=")]
+        [global::System.Configuration.DefaultSettingValueAttribute("LxK+190510.")]
         public string mscupR {
             get {
                 return ((string)(this["mscupR"]));
@@ -181,7 +181,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("aAXHjzruFVJ0G95xxMPwKw==")]
+        [global::System.Configuration.DefaultSettingValueAttribute("defaultdb")]
         public string mscdbR {
             get {
                 return ((string)(this["mscdbR"]));
@@ -193,7 +193,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("borXcW0ZPl8UN3BHvmvToQ==")]
+        [global::System.Configuration.DefaultSettingValueAttribute("18266")]
         public string mscprtR {
             get {
                 return ((string)(this["mscprtR"]));
