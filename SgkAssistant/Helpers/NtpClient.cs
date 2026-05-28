@@ -38,10 +38,19 @@ namespace SgkAssistant.Helpers
         }
         public static DateTime GetNetworkTime(string ntpServer)
         {
-            IPAddress[] address = Dns.GetHostEntry(ntpServer).AddressList;
+            IPAddress[] address = null;
+            try
+            {
+                var hostEntry = Dns.GetHostEntry(ntpServer);
+                address = hostEntry?.AddressList;
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Could not resolve ip address from '{ntpServer}'. Error: {ex.Message}", nameof(ntpServer));
+            }
 
             if (address == null || address.Length == 0)
-                throw new ArgumentException("Could not resolve ip address from '" + ntpServer + "'.", "ntpServer");
+                throw new ArgumentException("Could not resolve ip address from '" + ntpServer + "'.", nameof(ntpServer));
 
             IPEndPoint ep = new IPEndPoint(address[0], 123);
 

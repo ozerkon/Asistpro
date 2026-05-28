@@ -87,21 +87,20 @@ namespace SgkAssistant.Helpers
         {
             decimal his = 0;
 
-            DateTime zeroTime = new DateTime(1, 1, 1);
             TimeSpan spanAge = tarih.Subtract(personal.Dtr);
-            int age = Convert.ToInt32(spanAge.Days) < 0 ? 0 : (zeroTime + spanAge).Year - 1;
+            int age = spanAge.TotalDays < 0 ? 0 : (int)(spanAge.TotalDays / 365.25);
 
             TimeSpan spanYears = tarih.AddDays(1).Subtract(personal.Igt);
-            double workedYear = Convert.ToInt32(spanYears.Hours) < 0 ? 0 :   Convert.ToDouble(spanYears.Days) / 365 ;// (zeroTime + spanYears).Year - 1 ;
+            double workedYear = spanYears.TotalDays < 0 ? 0 : spanYears.TotalDays / 365.25;
             workedYear = Math.Floor(workedYear);
             workedYear = last ? workedYear + 1 : workedYear;
 
             TimeSpan spanDays = tarih.Subtract(lastPeriodStart);
-            int workedDay = Convert.ToInt32(spanDays.Hours) < 0 ? 0 : spanDays.Days;
+            int workedDay = spanDays.TotalDays < 0 ? 0 : (int)spanDays.TotalDays;
             if(unPaid > 0)
             {
                 spanDays = tarih.AddDays(366 - Convert.ToDouble(unPaid)).Subtract(tarih);
-                workedDay = Convert.ToInt32(spanDays.Hours) < 0 ? 0 : spanDays.Days;
+                workedDay = spanDays.TotalDays < 0 ? 0 : (int)spanDays.TotalDays;
             }
 
             if (age < 19 || (age > 50 && workedYear <= 15))

@@ -16,10 +16,17 @@ namespace SgkAssistant.Helpers
 
         public static string DecryptHc(string hc)
         {
+            if (string.IsNullOrEmpty(hc) || hc.Length < 22)
+            {
+                throw new ArgumentException("Invalid HC format");
+            }
             string sc = "";
             for (int i = 0; i <= 16; i += 4)
             {
-                sc += DecryptFourHex(hc.Substring(i, 4));
+                if (i + 4 <= hc.Length)
+                {
+                    sc += DecryptFourHex(hc.Substring(i, 4));
+                }
             }
             sc += hc.Substring(20, 2);
 
@@ -58,7 +65,11 @@ namespace SgkAssistant.Helpers
 
             Ay = Convert.ToInt32(sc.Substring(4, 2));
             string gunFromHc = sc.Substring(9, 1) + sc.Substring(13, 1) + sc.Substring(17, 1) + sc.Substring(21, 1);
-            Gun = Convert.ToInt32(gunFromHc);
+            if (!int.TryParse(gunFromHc, out int gunValue))
+            {
+                throw new FormatException($"Invalid Gun format: {gunFromHc}");
+            }
+            Gun = gunValue;
             return sc;
         }
         private static string DecryptFourHex(string s)

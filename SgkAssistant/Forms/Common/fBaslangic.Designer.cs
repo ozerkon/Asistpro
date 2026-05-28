@@ -2464,7 +2464,7 @@
             resources.ApplyResources(this.rtHesapDurumu, "rtHesapDurumu");
             this.rtHesapDurumu.AutoSize = true;
             this.rtHesapDurumu.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.rtHesapDurumu.IsSelected = true;
+            this.rtHesapDurumu.IsSelected = false;
             this.rtHesapDurumu.Items.AddRange(new Telerik.WinControls.RadItem[] {
             this.rbgDonemselBorc,
             this.rbgEborcuYoktur,
@@ -2867,7 +2867,7 @@
             // 
             resources.ApplyResources(this.rtHizmetListe, "rtHizmetListe");
             this.rtHizmetListe.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.rtHizmetListe.IsSelected = false;
+            this.rtHizmetListe.IsSelected = true;
             this.rtHizmetListe.Items.AddRange(new Telerik.WinControls.RadItem[] {
             this.radRibbonBarGroup8,
             this.rbgHLPeriods,

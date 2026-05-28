@@ -22,13 +22,14 @@ namespace SgkAssistant.Helpers
         {
             byte[] initVectorBytes = Encoding.UTF8.GetBytes(InitVector);
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-            using (PasswordDeriveBytes password = new PasswordDeriveBytes(passPhrase, null))
+            using (var rfc2898 = new Rfc2898DeriveBytes(passPhrase, Encoding.UTF8.GetBytes(InitVector), 1000, HashAlgorithmName.SHA256))
             {
-                byte[] keyBytes = password.GetBytes(Keysize / 8);
-                using (RijndaelManaged symmetricKey = new RijndaelManaged())
+                byte[] keyBytes = rfc2898.GetBytes(Keysize / 8);
+                using (Aes aes = Aes.Create())
                 {
-                    symmetricKey.Mode = CipherMode.CBC;
-                    using (ICryptoTransform encryptor = symmetricKey.CreateEncryptor(keyBytes, initVectorBytes))
+                    aes.Mode = CipherMode.CBC;
+                    aes.Padding = PaddingMode.PKCS7;
+                    using (ICryptoTransform encryptor = aes.CreateEncryptor(keyBytes, initVectorBytes))
                     {
                         using (MemoryStream memoryStream = new MemoryStream())
                         {

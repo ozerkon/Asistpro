@@ -75,14 +75,20 @@ namespace SGKServices.Captcha
         {
             
             msg = "";
-            string res = SolveAsync().Result;
-            if (res.Contains("hata: ") || res == null || res == "")
+            try
             {
-                return null;
-            }
-            else
-            {
+                string res = SolveAsync().Result;
+                if (string.IsNullOrEmpty(res) || res.Contains("hata: "))
+                {
+                    msg = "Captcha solving failed";
+                    return null;
+                }
                 return res;
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+                return null;
             }
         }
         public async Task<string> SolveAsync()
@@ -90,9 +96,10 @@ namespace SGKServices.Captcha
             //GlobalVars.ocrEngine = GlobalVars.ocrEngine == 4 ? 1 : GlobalVars.ocrEngine;
             try
             {
-                HttpClient httpClient = new HttpClient();
-                httpClient.Timeout = new TimeSpan(0, 0, 10);
-                MultipartFormDataContent form = new MultipartFormDataContent();
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    httpClient.Timeout = new TimeSpan(0, 0, 10);
+                    MultipartFormDataContent form = new MultipartFormDataContent();
                 byte[] imageData = File.ReadAllBytes(SearchReport.LastCaptchaPath);
 
                 form.Add(new StringContent(accessToken), "apikey"); //Added api key in form data
@@ -102,32 +109,32 @@ namespace SGKServices.Captcha
                 form.Add(new StringContent("true"), "istable");
                 form.Add(new ByteArrayContent(imageData, 0, imageData.Length), "image", "image.jpg");
 
-                HttpResponseMessage response = await httpClient.PostAsync("https://api.ocr.space/Parse/Image", form);
-                string strContent = await response.Content.ReadAsStringAsync();
-                Rootobject ocrResult = JsonConvert.DeserializeObject<Rootobject>(strContent);
-                string captchaText = "";
+                    HttpResponseMessage response = await httpClient.PostAsync("https://api.ocr.space/Parse/Image", form);
+                    string strContent = await response.Content.ReadAsStringAsync();
+                    Rootobject ocrResult = JsonConvert.DeserializeObject<Rootobject>(strContent);
+                    string captchaText = "";
 
-                if (ocrResult.OcrExitCode == 1)
-                {
-                    for (int i = 0; i < ocrResult.ParsedResults.Count(); i++)
+                    if (ocrResult?.OcrExitCode == 1)
                     {
-                        captchaText += ocrResult.ParsedResults[i].ParsedText;
+                        for (int i = 0; i < ocrResult.ParsedResults.Count(); i++)
+                        {
+                            captchaText += ocrResult.ParsedResults[i].ParsedText;
+                        }
                     }
+                    else
+                    {
+                        captchaText = $"Hata: {strContent}";
+                    }
+                    captchaText = captchaText.Replace("\t\r\n", "");
+                    return captchaText;
                 }
-                else
-                {
-                    captchaText = $"Hata: {strContent}";
-                }
-                httpClient.Dispose();
-                captchaText = captchaText.Replace("\t\r\n", "");
-                return captchaText;
             }
             catch (Exception ex)
             {
                 if (GlobalVars.OcrEngine <= 3)
                 {
                     GlobalVars.OcrEngine++;
-                    await SolveAsync();
+                    return await SolveAsync();
                 }
                 return $"hata: {ex.Message}";
             }
