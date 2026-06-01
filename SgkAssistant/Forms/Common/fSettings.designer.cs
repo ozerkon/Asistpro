@@ -1541,7 +1541,7 @@
             this.rbUpdateOnceADay.Location = new System.Drawing.Point(18, 105);
             this.rbUpdateOnceADay.Margin = new System.Windows.Forms.Padding(3, 5, 3, 0);
             this.rbUpdateOnceADay.Name = "rbUpdateOnceADay";
-            this.rbUpdateOnceADay.Size = new System.Drawing.Size(146, 18);
+            this.rbUpdateOnceADay.Size = new System.Drawing.Size(142, 18);
             this.rbUpdateOnceADay.TabIndex = 5;
             this.rbUpdateOnceADay.TabStop = false;
             this.rbUpdateOnceADay.Text = "Günde bir kez kontrol et";

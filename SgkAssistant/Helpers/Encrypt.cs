@@ -18,31 +18,67 @@ namespace SgkAssistant.Helpers
         // This constant is used to determine the keysize of the encryption algorithm
         private const int Keysize = 256;
         //Encrypt
+        //public static string EncryptString(string plainText, string passPhrase)
+        //{
+        //    byte[] initVectorBytes = Encoding.UTF8.GetBytes(InitVector);
+        //    byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+        //    using (var rfc2898 = new Rfc2898DeriveBytes(passPhrase, Encoding.UTF8.GetBytes(InitVector), 1000, HashAlgorithmName.SHA256))
+        //    {
+        //        byte[] keyBytes = rfc2898.GetBytes(Keysize / 8);
+        //        using (Aes aes = Aes.Create())
+        //        {
+        //            aes.Mode = CipherMode.CBC;
+        //            aes.Padding = PaddingMode.PKCS7;
+        //            using (ICryptoTransform encryptor = aes.CreateEncryptor(keyBytes, initVectorBytes))
+        //            {
+        //                using (MemoryStream memoryStream = new MemoryStream())
+        //                {
+        //                    using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+        //                    {
+        //                        cryptoStream.Write(plainTextBytes, 0, plainTextBytes.Length);
+        //                        cryptoStream.FlushFinalBlock();
+        //                        byte[] cipherTextBytes = memoryStream.ToArray();
+        //                        return Convert.ToBase64String(cipherTextBytes);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
         public static string EncryptString(string plainText, string passPhrase)
         {
-            byte[] initVectorBytes = Encoding.UTF8.GetBytes(InitVector);
-            byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-            using (var rfc2898 = new Rfc2898DeriveBytes(passPhrase, Encoding.UTF8.GetBytes(InitVector), 1000, HashAlgorithmName.SHA256))
+            try
             {
-                byte[] keyBytes = rfc2898.GetBytes(Keysize / 8);
-                using (Aes aes = Aes.Create())
+                byte[] initVectorBytes = Encoding.UTF8.GetBytes(InitVector);
+                byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+
+                // Orijinal algoritma olan PasswordDeriveBytes korundu ve düzgünce dispose edildi
+                using (PasswordDeriveBytes password = new PasswordDeriveBytes(passPhrase, null))
                 {
-                    aes.Mode = CipherMode.CBC;
-                    aes.Padding = PaddingMode.PKCS7;
-                    using (ICryptoTransform encryptor = aes.CreateEncryptor(keyBytes, initVectorBytes))
+                    byte[] keyBytes = password.GetBytes(Keysize / 8);
+                    using (RijndaelManaged symmetricKey = new RijndaelManaged())
                     {
-                        using (MemoryStream memoryStream = new MemoryStream())
+                        symmetricKey.Mode = CipherMode.CBC;
+                        using (ICryptoTransform encryptor = symmetricKey.CreateEncryptor(keyBytes, initVectorBytes))
                         {
-                            using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+                            using (MemoryStream memoryStream = new MemoryStream())
                             {
-                                cryptoStream.Write(plainTextBytes, 0, plainTextBytes.Length);
-                                cryptoStream.FlushFinalBlock();
-                                byte[] cipherTextBytes = memoryStream.ToArray();
-                                return Convert.ToBase64String(cipherTextBytes);
+                                using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+                                {
+                                    cryptoStream.Write(plainTextBytes, 0, plainTextBytes.Length);
+                                    cryptoStream.FlushFinalBlock();
+                                    byte[] cipherTextBytes = memoryStream.ToArray();
+                                    return Convert.ToBase64String(cipherTextBytes);
+                                }
                             }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Encryption error: {ex.Message}");
+                return "";
             }
         }
         //Decrypt

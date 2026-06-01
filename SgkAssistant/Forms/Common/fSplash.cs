@@ -28,9 +28,9 @@ namespace SgkAssistant.Forms.Common
                 Settings.Default.tabOrderHizmetListe = new TabOrder() { Index = 3, TabName = "rtHizmetListe", IsHide = false };
                 Settings.Default.tabOrderIgic = new TabOrder() { Index = 4, TabName = "rtIgic", IsHide = false };
                 Settings.Default.tabOrderLastName = new TabOrder() { Index = 5, TabName = "rtLastName", IsHide = false };
-                Settings.Default.tabOrderSettings = new TabOrder() { Index = 6, TabName = "rtYillik", IsHide = false };
+                Settings.Default.tabOrderSettings = new TabOrder() { Index = 6, TabName = "rtOptions", IsHide = false };
                 Settings.Default.tabOrderTesvik = new TabOrder() { Index = 7, TabName = "rtTesvik", IsHide = false };
-                Settings.Default.tabOrderYillik = new TabOrder() { Index = 8, TabName = "rtOptions", IsHide = false };
+                Settings.Default.tabOrderYillik = new TabOrder() { Index = 8, TabName = "rtYillik", IsHide = false };
                 Settings.Default.Save();
             }
             
@@ -51,11 +51,11 @@ namespace SgkAssistant.Forms.Common
             Settings.Default.mscdbR = Encrypt.EncryptString(Settings.Default.mscdbR, GlobalVars.PassPhrase);
             Settings.Default.mscprtR = Encrypt.EncryptString(Settings.Default.mscprtR, GlobalVars.PassPhrase);
 
-            Settings.Default.mschostL = Encrypt.DecryptString(Settings.Default.mschostL, GlobalVars.PassPhrase);
-            Settings.Default.mscuidL = Encrypt.DecryptString(Settings.Default.mscuidL, GlobalVars.PassPhrase);
-            Settings.Default.mscupL = Encrypt.DecryptString(Settings.Default.mscupL, GlobalVars.PassPhrase);
-            Settings.Default.mscdbL = Encrypt.DecryptString(Settings.Default.mscdbL, GlobalVars.PassPhrase);
-            Settings.Default.mscprtL = Encrypt.DecryptString(Settings.Default.mscprtL, GlobalVars.PassPhrase);
+            Settings.Default.mschostL = Encrypt.EncryptString(Settings.Default.mschostL, GlobalVars.PassPhrase);
+            Settings.Default.mscuidL = Encrypt.EncryptString(Settings.Default.mscuidL, GlobalVars.PassPhrase);
+            Settings.Default.mscupL = Encrypt.EncryptString(Settings.Default.mscupL, GlobalVars.PassPhrase);
+            Settings.Default.mscdbL = Encrypt.EncryptString(Settings.Default.mscdbL, GlobalVars.PassPhrase);
+            Settings.Default.mscprtL = Encrypt.EncryptString(Settings.Default.mscprtL, GlobalVars.PassPhrase);
 
             Settings.Default.Save();
         }

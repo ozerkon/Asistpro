@@ -15,19 +15,19 @@
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="mschostL" Type="System.String" Scope="User">
-      <Value Profile="(Default)">P8IU78ky6kb7vPyXRKvEgQ==</Value>
+      <Value Profile="(Default)">localhost</Value>
     </Setting>
     <Setting Name="mscuidL" Type="System.String" Scope="User">
-      <Value Profile="(Default)">I3HC09eFH0jF8KkaDbhLXA==</Value>
+      <Value Profile="(Default)">root</Value>
     </Setting>
     <Setting Name="mscupL" Type="System.String" Scope="User">
-      <Value Profile="(Default)">PEIRl27RhvVcfrru0f84xA==</Value>
+      <Value Profile="(Default)">LxK190510</Value>
     </Setting>
     <Setting Name="mscdbL" Type="System.String" Scope="User">
-      <Value Profile="(Default)">35f5k7K+lgfPzp0pFOkmHA==</Value>
+      <Value Profile="(Default)">asistan</Value>
     </Setting>
     <Setting Name="mscprtL" Type="System.String" Scope="User">
-      <Value Profile="(Default)">izrolWego1szTT3iQ0OpTA==</Value>
+      <Value Profile="(Default)">3306</Value>
     </Setting>
     <Setting Name="solverKey" Type="System.String" Scope="User">
       <Value Profile="(Default)">K82964397288957</Value>

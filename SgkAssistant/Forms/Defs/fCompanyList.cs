@@ -87,8 +87,8 @@ namespace SgkAssistant.Forms.Defs
             try
             {
                 row = rgvCompanyList.CurrentRow;
-                c = IOC.CompanyDataService.GetCompanyById(Convert.ToInt32(rgvCompanyList.CurrentRow.Cells[0].Value), out msg);
-                if (c.Kkc.Year > DateTime.Now.Year) { lblMessage.Text = $"Aktif durumdaki firma silinemez!"; lblMessage.Visibility = ElementVisibility.Visible; btnOpenFile.Visibility = ElementVisibility.Collapsed; return; }
+                c = IOC.CompanyDataService.GetCompanyById(Convert.ToInt32(rgvCompanyList.CurrentRow.Cells[23].Value), out msg);
+                //if (c.Kkc.Year > DateTime.Now.Year) { lblMessage.Text = $"Aktif durumdaki firma silinemez!"; lblMessage.Visibility = ElementVisibility.Visible; btnOpenFile.Visibility = ElementVisibility.Collapsed; return; }
                 bool allowDelete = false; int result = 0;
                 var confirmResult = RadMessageBox.Show($"{c.CompanyName} adlı firma silinecek", "Silme işlemini onayla", MessageBoxButtons.YesNo, RadMessageIcon.Question);
                 if (confirmResult == DialogResult.No)
@@ -109,13 +109,11 @@ namespace SgkAssistant.Forms.Defs
                 {
                     cbreMessage.Visibility = ElementVisibility.Visible; cbbUndoDelete.Visibility = ElementVisibility.Visible;
                     cblMessage.Text = $"{c.CompanyName} adlı firma silindi";
-                    Settings.Default.sgscEnc = Settings.Default.sgscEnc.Replace(sgscEnc, ""); Settings.Default.Save();
-                    GlobalVars.SgscEnc = GlobalVars.SgscEnc.Replace(sgscEnc, "");
                     Changed.HasChanged = true; Changed.HasChangedForDialogBox = true;
                     rgvCompanyList.Rows.Remove(row);
                     rgvCompanyList.Refresh();
                     cbbUndoDelete.Enabled = true;
-                    
+                    IOC.WinHelpers.ResetSgsc(out msg);
                 }
                 else
                 {
@@ -141,13 +139,15 @@ namespace SgkAssistant.Forms.Defs
                 if (result == 1)
                 {
                     cblMessage.Text = $"{c.CompanyName} adlı firma tekrar eklendi";
-                    IOC.WinHelpers.AddSgscEnc(c.Sgsc, out msg);
+                    
+
                     Changed.HasChanged = true; Changed.HasChangedForDialogBox = true;
                     lastId = IOC.CompanyDataService.GetLastId(out msg);
                     foreach (Company comp in toUpdate)
                     {
                         IOC.CompanyDataService.UpdateFm(comp, lastId, out msg);
                     }
+                    IOC.WinHelpers.ResetSgsc(out msg);
                     List();
                     rgvCompanyList.Refresh();
                     cbbUndoDelete.Enabled = false;
@@ -165,7 +165,7 @@ namespace SgkAssistant.Forms.Defs
                 cblMessage.Text = $"Geri alma işlemi başarısız! Hata: {msg}";
             }
         }
-
+        
         private void cbbCloseMessage_Click(object sender, EventArgs e)
         {
             cbreMessage.Visibility = ElementVisibility.Collapsed;

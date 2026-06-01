@@ -215,6 +215,7 @@ namespace SgkAssistant.Forms.Common
 
             tabOrders.Sort((a, b) => a.Index.CompareTo(b.Index));
             IOC.DesignHelper.OrderRibbonTabs(ribbonBar, tabOrders);
+            
             ribbonBar.RibbonBarElement.TabStripElement.SelectedItem =   ribbonBar.RibbonBarElement.TabStripElement.Items[0];
             InitializeBgwSearch();
             InitializeBgwConfirm();

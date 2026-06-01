@@ -17,6 +17,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <LangVersion>latest</LangVersion>
     <PublishUrl>\\176.53.40.210\sgkasistan\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Unc</InstallFrom>
@@ -32,12 +33,11 @@
     <TargetCulture>tr-TR</TargetCulture>
     <ProductName>SGK Asistan</ProductName>
     <PublisherName>SinerjiA</PublisherName>
-    <ApplicationRevision>6</ApplicationRevision>
-    <ApplicationVersion>1.1.0.%2a</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.2.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -78,7 +78,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>asistpro.ico</ApplicationIcon>
+    <ApplicationIcon>asistpro.fw.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>A0F939E413579806874E13DA5C7D59765AB81F06</ManifestCertificateThumbprint>
@@ -545,9 +545,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <!--sirinie -->
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\about.png" />
   </ItemGroup>
   <ItemGroup>
@@ -914,13 +911,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="asistanMavi.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="asistansimge.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="asistpro.ico" />
     <None Include="Resources\export-pdf-50.png" />
     <None Include="Resources\PersonalSearch.fw.png" />
     <None Include="Resources\question24.png" />
@@ -989,6 +979,9 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="asistpro.fw.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

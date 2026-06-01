@@ -7,6 +7,7 @@ using SgkAssistant.LinkOperations;
 using SgkAssistant.Properties;
 using SGKServices;
 using SGKServices.Captcha;
+using System;
 
 namespace SgkAssistant
 {
@@ -124,6 +125,7 @@ namespace SgkAssistant
             }
         }
 
+
         public static ICaptchaSolver Solver
         {
             get
@@ -132,7 +134,14 @@ namespace SgkAssistant
                     _solver = SolverFactory.CreateSolver(Settings.Default.solverType);
                 return _solver;
             }
+            set
+            {
+                // ÇÖZÜM: set bloğunu ekleyerek btnKaydet_Click içindeki atama hatasını çözüyoruz.
+                _solver = value;
+            }
         }
+
+        // Statik servis örnekleri
         public static TrmBase TrmBase = new TrmBase();
         public static WinHelpers WinHelpers = new WinHelpers();
         public static PersonalService PersonalService = new PersonalService();
@@ -157,18 +166,23 @@ namespace SgkAssistant
 
         public static LinkOps LinkOps = new LinkOps();
         public static IncentiveOps IncentiveOps = new IncentiveOps();
-        public static void SetDbBase(int dbType)
+
+        /// <summary>
+        /// Veritabanı servislerini gelen parametreye göre dinamik olarak yeniden yapılandırır.
+        /// </summary>
+        public static void SetDbBase(byte dbType)
         {
-            DBBase = DbFactory.CreateDbBase(Settings.Default.dbType);
-            CompanyDataService = DbFactory.CreateCompanyDataService(Settings.Default.dbType);
-            UserDataService = DbFactory.CreateUserDataService(Settings.Default.dbType);
-            PersonalDataService = DbFactory.CreatePersonalDataService(Settings.Default.dbType);
-            LeaveDataService = DbFactory.CreateLeaveDataService(Settings.Default.dbType);
-            LeavePeriodDataService = DbFactory.CreateLeavePeriodDataService(Settings.Default.dbType);
-            LinksDataService = DbFactory.CreateLinksDataService(Settings.Default.dbType);
-            PkcData = DbFactory.CreatePkcDataService(Settings.Default.dbType);
-            SgkDataService = DbFactory.CreateSgkDataService(Settings.Default.dbType);
-            AccrualDataService = DbFactory.CreateAccuralDataService(Settings.Default.dbType);
+            // ÇÖZÜM: Doğrudan private backing field'lara atama yapıyoruz ve gelen dbType parametresini kullanıyoruz.
+            _dbBase = DbFactory.CreateDbBase(dbType);
+            _companyDataService = DbFactory.CreateCompanyDataService(dbType);
+            _userDataService = DbFactory.CreateUserDataService(dbType);
+            _personalDataService = DbFactory.CreatePersonalDataService(dbType);
+            _leaveDataService = DbFactory.CreateLeaveDataService(dbType);
+            _leavePeriodDataService = DbFactory.CreateLeavePeriodDataService(dbType);
+            _linksDataService = DbFactory.CreateLinksDataService(dbType);
+            _pkcData = DbFactory.CreatePkcDataService(dbType);
+            _sgkDataService = DbFactory.CreateSgkDataService(dbType);
+            _accrualDataService = DbFactory.CreateAccuralDataService(dbType);
         }
     }
 }

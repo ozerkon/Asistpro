@@ -219,7 +219,8 @@ namespace SgkAssistant.LinkOperations
                             string browser = LinkGlobals.BrowserType == 0 ? "firefox" : "chrome";
                             GlobalVars.ProcessReport += $"<li><strong><span style=\"font-size: 10pt; color: red\">Sayfa yüklenemedi, {browser} yenileniyor</span></strong></li>";
                             lbl.Text = GlobalVars.ProcessReport;
-                            Surucu.Driver.Navigate().Refresh();
+                            Surucu.Driver.Url = url;
+                            //Surucu.Driver.Navigate().Refresh();
                             continue; 
                         }
                         else
@@ -430,7 +431,8 @@ namespace SgkAssistant.LinkOperations
                     break;
                 case SgrpEnum.ebildirgev2:
                     clkLast = IOC.SgkLinksService.Command.Substring(clkLoc + 11, lckLoc - clkLoc - 11).Replace("\r\n", "").Trim();
-                    Surucu.Driver.Navigate().Refresh(); IOC.SgkLinksService.WaitForPageLoaded(out msg);
+                    Surucu.Driver.Navigate().Refresh(); 
+                    IOC.SgkLinksService.WaitForPageLoaded(out msg);
                     IOC.SgkLinksService.WaitForPageLoaded(out msg);
                     IWebElement linkText = IOC.SgkLinksService.GetElementBy("t", clkLast, out msg);
                     if(linkText != null)

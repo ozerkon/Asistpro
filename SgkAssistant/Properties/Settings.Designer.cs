@@ -73,7 +73,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("P8IU78ky6kb7vPyXRKvEgQ==")]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
         public string mschostL {
             get {
                 return ((string)(this["mschostL"]));
@@ -85,7 +85,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("I3HC09eFH0jF8KkaDbhLXA==")]
+        [global::System.Configuration.DefaultSettingValueAttribute("root")]
         public string mscuidL {
             get {
                 return ((string)(this["mscuidL"]));
@@ -97,7 +97,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("PEIRl27RhvVcfrru0f84xA==")]
+        [global::System.Configuration.DefaultSettingValueAttribute("LxK190510")]
         public string mscupL {
             get {
                 return ((string)(this["mscupL"]));
@@ -109,7 +109,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("35f5k7K+lgfPzp0pFOkmHA==")]
+        [global::System.Configuration.DefaultSettingValueAttribute("asistan")]
         public string mscdbL {
             get {
                 return ((string)(this["mscdbL"]));
@@ -121,7 +121,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("izrolWego1szTT3iQ0OpTA==")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3306")]
         public string mscprtL {
             get {
                 return ((string)(this["mscprtL"]));

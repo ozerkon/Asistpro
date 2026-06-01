@@ -43,6 +43,7 @@ namespace SgkAssistant.Helpers
             rrb.CommandTabs.Remove(rtHizmetListe);
             rrb.CommandTabs.Remove(rtOptions);
             rrb.CommandTabs.Remove(rtIgic);
+            rrb.CommandTabs.Remove(rtYillik);
             rrb.CommandTabs.Clear();
             foreach (TabOrder item in taborders)
             {

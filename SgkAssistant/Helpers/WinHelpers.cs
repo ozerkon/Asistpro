@@ -43,6 +43,7 @@ namespace SgkAssistant.Helpers
         private static string _driverLocation = "";
         public bool SetCompanyListRgv(RadGridView source, out string msg)
         {
+            
             try
             {
                 GlobalVars.Companies = IOC.CompanyDataService.GetCompanies(out msg);
@@ -155,6 +156,15 @@ namespace SgkAssistant.Helpers
                 sgscEnc += Encrypt.EncryptString(comp.Sgsc, Settings.Default.discid);
             }
             return sgscEnc;
+        }
+        public void ResetSgsc(out string msg)
+        {
+            GlobalVars.Companies = IOC.CompanyDataService.GetCompanies(out msg);
+            GlobalVars.SgscEnc = GetSgscEncFromCompanies();
+            IOC.CompanyDataService.UpdateSgscEnc(GlobalVars.SgscEnc, out msg);
+            Settings.Default.sgscEnc = GlobalVars.SgscEnc;
+            Settings.Default.Save();
+
         }
         public void AddSgscEnc(string sgsc, out string msg)
         {
@@ -974,7 +984,7 @@ namespace SgkAssistant.Helpers
         {
             msg = "";
             _driverLocation = Application.StartupPath;
-
+            //StartDriver();
             bool aktifDriverYasiyor = false;
             int aktifDriverTipi = -1; // -1: Yok/Bilinmiyor, 0: Firefox, 1: Chrome
 
@@ -1047,7 +1057,21 @@ namespace SgkAssistant.Helpers
 
             return Surucu.Driver;
         }
-
+        protected void StartDriver()
+        {
+            ChromeOptions options = new ChromeOptions();
+                
+                options.AddArgument("--headless=new");
+                int sw = Screen.PrimaryScreen.Bounds.Width;
+                int sh = Screen.PrimaryScreen.Bounds.Height;
+                options.AddArgument($"window-size={sw},{sh}");
+                string userDataDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                Directory.CreateDirectory(userDataDir);
+                options.AddArgument($"--user-data-dir={userDataDir}");
+                options.AddArgument("--no-sandbox");
+                options.AddArgument("--disable-dev-shm-usage");
+            Surucu.Driver = new ChromeDriver(options);
+        }
         public void SetFirefoxOptionsForDownload(bool hideBrowser)
         {
             FirefoxOptions firefoxOptions = new FirefoxOptions();
@@ -1097,54 +1121,53 @@ namespace SgkAssistant.Helpers
 
         public void SetChromeOptionsForDownload(bool hideBrowser)
         {
-            string msg = "";
             ChromeOptions chromeOptions = new ChromeOptions();
-            ChromeDriverService cDriverService;
             _driverLocation = Application.StartupPath;
 
-            // 1. Çökmeleri Önleyen Temel Güvenlik Argümanları
-            chromeOptions.AddExcludedArgument("enable-automation");
+            // 1. Çalışan Metottaki Kararlı Headless ve Boyut Ayarları
+            if (hideBrowser)
+            {
+                chromeOptions.AddArgument("--headless=new");
+            }
+
+            int sw = Screen.PrimaryScreen.Bounds.Width;
+            int sh = Screen.PrimaryScreen.Bounds.Height;
+            chromeOptions.AddArgument($"window-size={sw},{sh}");
+
+            // 2. ÇALIŞAN SİHRALİ FORMÜL: Her seferinde kilitlenmeyen, çakışmayan benzersiz geçici profil
+            string userDataDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SgkOto_" + System.IO.Path.GetRandomFileName());
+            System.IO.Directory.CreateDirectory(userDataDir);
+            chromeOptions.AddArgument($"--user-data-dir={userDataDir}");
+
+            // 3. Güvenlik ve Kararlılık Argümanları (Çakışma yaratanlar temizlendi)
+            chromeOptions.AddArgument("--no-sandbox");
+            chromeOptions.AddArgument("--disable-dev-shm-usage");
             chromeOptions.AddArgument("--remote-allow-origins=*");
             chromeOptions.AddArgument("--disable-notifications");
-            chromeOptions.AddArgument("--disable-extensions"); // Bozuk eklentilerin yüklenip çökertmesini engeller
-            chromeOptions.AddArgument("--disable-gpu"); // Ekran kartı ivmelenmesini kapatır (Windows çakışmalarını çözer)
+            chromeOptions.AddArgument("--disable-extensions");
+            chromeOptions.AddArgument("--disable-gpu");
+            chromeOptions.AddArgument("--disable-blink-features=AutomationControlled");
 
-            // 2. KRİTİK ADIM: Windows Temp klasörü yerine projenin altında özel bir profil açıyoruz.
-            // Bu sayede antivirüs ve yetki engellemelerini (scoped_dir hatasını) tamamen bypass ederiz.
-            string customProfilePath = System.IO.Path.Combine(Application.StartupPath, "ChromeOtoProfil");
-            if (!System.IO.Directory.Exists(customProfilePath))
-            {
-                System.IO.Directory.CreateDirectory(customProfilePath);
-            }
-            chromeOptions.AddArgument($"--user-data-dir={customProfilePath}");
+            // Konsol kirliliğini önlemek için log seviyesi
+            chromeOptions.AddArgument("--log-level=3");
+            chromeOptions.AddArgument("--silent");
 
-            // Profil ve İndirme Tercihleri
+            // 4. İndirme ve Profil Tercihleri (Bizim metottan korunanlar)
             chromeOptions.AddUserProfilePreference("credentials_enable_service", false);
             chromeOptions.AddUserProfilePreference("profile.password_manager_enabled", false);
             chromeOptions.AddUserProfilePreference("download.default_directory", SearchReport.DownloadDir);
             chromeOptions.AddUserProfilePreference("intl.accept_languages", "tr");
             chromeOptions.AddUserProfilePreference("disable-popup-blocking", "true");
 
-            if (hideBrowser)
-            {
-                chromeOptions.AddArgument("--headless=new");
-                int sw = Screen.PrimaryScreen.Bounds.Width;
-                int sh = Screen.PrimaryScreen.Bounds.Height;
-                chromeOptions.AddArguments($"window-size={sw},{sh}");
-            }
-
             try
             {
-                cDriverService = ChromeDriverService.CreateDefaultService();
-                cDriverService.HideCommandPromptWindow = true;
-                Surucu.Driver = new ChromeDriver(cDriverService, chromeOptions);
+                // Çalışan metottaki gibi temiz ve doğrudan başlatma (Service karmaşası olmadan)
+                Surucu.Driver = new ChromeDriver(chromeOptions);
             }
             catch (Exception ex)
             {
-                msg = ex.Message;
-                cDriverService = ChromeDriverService.CreateDefaultService(Application.StartupPath);
-                cDriverService.HideCommandPromptWindow = true;
-                Surucu.Driver = new ChromeDriver(cDriverService, chromeOptions);
+                System.Diagnostics.Debug.WriteLine($"Chrome sürücü başlatılamadı: {ex.Message}");
+                throw;
             }
         }
         private static ChromeOptions GetChromeOptions(bool headless)

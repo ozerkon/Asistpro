@@ -57,21 +57,23 @@ namespace DataServices
                 }
             }
         }
-        //Decrypt
         public static string DecryptString(string cipherText, string passPhrase)
         {
             try
             {
                 byte[] initVectorBytes = Encoding.ASCII.GetBytes(InitVector);
                 byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
-                using (var rfc2898 = new Rfc2898DeriveBytes(passPhrase, Encoding.UTF8.GetBytes(InitVector), 1000, HashAlgorithmName.SHA256))
+
+                // Sonucu metodun en sonunda dönmek için dışarıda tanımlıyoruz
+                string decryptedText = string.Empty;
+
+                using (PasswordDeriveBytes password = new PasswordDeriveBytes(passPhrase, null))
                 {
-                    byte[] keyBytes = rfc2898.GetBytes(Keysize / 8);
-                    using (Aes aes = Aes.Create())
+                    byte[] keyBytes = password.GetBytes(Keysize / 8);
+                    using (RijndaelManaged symmetricKey = new RijndaelManaged())
                     {
-                        aes.Mode = CipherMode.CBC;
-                        aes.Padding = PaddingMode.PKCS7;
-                        using (ICryptoTransform decryptor = aes.CreateDecryptor(keyBytes, initVectorBytes))
+                        symmetricKey.Mode = CipherMode.CBC;
+                        using (ICryptoTransform decryptor = symmetricKey.CreateDecryptor(keyBytes, initVectorBytes))
                         {
                             using (MemoryStream memoryStream = new MemoryStream(cipherTextBytes))
                             {
@@ -79,12 +81,17 @@ namespace DataServices
                                 {
                                     byte[] plainTextBytes = new byte[cipherTextBytes.Length];
                                     int decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
-                                    return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
-                                }
-                            }
+
+                                    // Nesnelerin tamamen kapanmasını (Dispose) beklemek için veriyi burada değişken yardımıyla alıyoruz
+                                    decryptedText = Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
+                                } // -> cryptoStream burada güvenle kapanıyor ve şifre çözme bitiriliyor
+                            } // -> memoryStream kapanıyor
                         }
                     }
                 }
+
+                // Tüm kriptografik kilitler açıldıktan ve nesneler temizlendikten sonra sonucu dönüyoruz
+                return decryptedText;
             }
             catch (Exception ex)
             {
@@ -92,7 +99,6 @@ namespace DataServices
                 return "";
             }
         }
-
         internal static byte[] GenerateSalt(int saltByteSize = SaltByteSize)
         {
             using (RNGCryptoServiceProvider saltGenerator = new RNGCryptoServiceProvider())

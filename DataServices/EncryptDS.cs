@@ -14,24 +14,27 @@ namespace DataServices
         private const int HashByteSize = 24;
         private const int HasingIterationsCount = 10101;
 
-        // This size of the IV (in bytes) must = (keysize / 8).  Default keysize is 256, so the IV must be
-        // 32 bytes long.  Using a 16 character string here gives us 32 bytes when converted to a byte array.
+        // This size of the IV (in bytes) must = (keysize / 8). Default keysize is 256, so the IV must be
+        // 32 bytes long. Using a 16 character string here gives us 32 bytes when converted to a byte array.
         private const string InitVector = "pemgail9uzpgzl88";
         // This constant is used to determine the keysize of the encryption algorithm
         private const int Keysize = 256;
-        //Encrypt
+
+        // Encrypt
         public static string EncryptString(string plainText, string passPhrase)
         {
+            if (string.IsNullOrEmpty(plainText)) return "";
+
             byte[] initVectorBytes = Encoding.UTF8.GetBytes(InitVector);
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-            using (var rfc2898 = new Rfc2898DeriveBytes(passPhrase, Encoding.UTF8.GetBytes(InitVector), 1000, HashAlgorithmName.SHA256))
+
+            using (PasswordDeriveBytes password = new PasswordDeriveBytes(passPhrase, null))
             {
-                byte[] keyBytes = rfc2898.GetBytes(Keysize / 8);
-                using (Aes aes = Aes.Create())
+                byte[] keyBytes = password.GetBytes(Keysize / 8);
+                using (RijndaelManaged symmetricKey = new RijndaelManaged())
                 {
-                    aes.Mode = CipherMode.CBC;
-                    aes.Padding = PaddingMode.PKCS7;
-                    using (ICryptoTransform encryptor = aes.CreateEncryptor(keyBytes, initVectorBytes))
+                    symmetricKey.Mode = CipherMode.CBC;
+                    using (ICryptoTransform encryptor = symmetricKey.CreateEncryptor(keyBytes, initVectorBytes))
                     {
                         using (MemoryStream memoryStream = new MemoryStream())
                         {
@@ -47,31 +50,47 @@ namespace DataServices
                 }
             }
         }
-        //Decrypt
+
+        // Decrypt
         public static string DecryptString(string cipherText, string passPhrase)
         {
-            byte[] initVectorBytes = Encoding.ASCII.GetBytes(InitVector);
-            byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
-            using (var rfc2898 = new Rfc2898DeriveBytes(passPhrase, Encoding.UTF8.GetBytes(InitVector), 1000, HashAlgorithmName.SHA256))
+            if (string.IsNullOrEmpty(cipherText)) return "";
+
+            try
             {
-                byte[] keyBytes = rfc2898.GetBytes(Keysize / 8);
-                using (Aes aes = Aes.Create())
+                byte[] initVectorBytes = Encoding.ASCII.GetBytes(InitVector);
+                byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
+                string decryptedText = string.Empty;
+
+                using (PasswordDeriveBytes password = new PasswordDeriveBytes(passPhrase, null))
                 {
-                    aes.Mode = CipherMode.CBC;
-                    aes.Padding = PaddingMode.PKCS7;
-                    using (ICryptoTransform decryptor = aes.CreateDecryptor(keyBytes, initVectorBytes))
+                    byte[] keyBytes = password.GetBytes(Keysize / 8);
+                    using (RijndaelManaged symmetricKey = new RijndaelManaged())
                     {
-                        using (MemoryStream memoryStream = new MemoryStream(cipherTextBytes))
+                        symmetricKey.Mode = CipherMode.CBC;
+                        using (ICryptoTransform decryptor = symmetricKey.CreateDecryptor(keyBytes, initVectorBytes))
                         {
-                            using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
+                            using (MemoryStream memoryStream = new MemoryStream(cipherTextBytes))
                             {
-                                byte[] plainTextBytes = new byte[cipherTextBytes.Length];
-                                int decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
-                                return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
+                                using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
+                                {
+                                    byte[] plainTextBytes = new byte[cipherTextBytes.Length];
+                                    int decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
+
+                                    // stream kapatılmadan hemen önce veriyi alıyoruz
+                                    decryptedText = Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
+                                }
                             }
                         }
                     }
                 }
+
+                return decryptedText;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Decryption error: {ex.Message}");
+                return "";
             }
         }
 
@@ -84,10 +103,12 @@ namespace DataServices
                 return salt;
             }
         }
+
         public static string GenerateSalt()
         {
             return System.Text.Encoding.Default.GetString(GenerateSalt(SaltByteSize));
         }
+
         public static string GenerateSaltVl(int vls)
         {
             return System.Text.Encoding.Default.GetString(GenerateSalt(vls));
@@ -101,13 +122,13 @@ namespace DataServices
                 return hashGenerator.GetBytes(hashByteSize);
             }
         }
+
         public static string GenerateHash(string password, string salt)
         {
             return System.Text.Encoding.Default.GetString(ComputeHash(password, Encoding.ASCII.GetBytes(salt), HasingIterationsCount, HashByteSize));
         }
 
-
-        //Length constant verification - prevents timing attack
+        // Length constant verification - prevents timing attack
         private static bool AreHashesEqual(byte[] firstHash, byte[] secondHash)
         {
             int minHashLenght = firstHash.Length <= secondHash.Length ? firstHash.Length : secondHash.Length;
@@ -116,11 +137,13 @@ namespace DataServices
                 xor |= firstHash[i] ^ secondHash[i];
             return 0 == xor;
         }
+
         internal static bool VerifyPassword(string password, byte[] passwordSalt, byte[] passwordHash)
         {
             byte[] computedHash = ComputeHash(password, passwordSalt);
             return AreHashesEqual(computedHash, passwordHash);
         }
+
         public static bool VerifyUserPassword(string password, string passwordSalt, string passwordHash)
         {
             return VerifyPassword(password, Encoding.ASCII.GetBytes(passwordSalt), Encoding.ASCII.GetBytes(passwordHash));
@@ -129,10 +152,10 @@ namespace DataServices
         public static string Rsglmt(int b)
         {
             Random rs = new Random((int)DateTime.Now.Ticks);
-            Random rs2 = new Random((int)DateTime.Now.Ticks - 2361);
             string input = "abcdefghijklmnopqrstuvwxyz0123456789";
             return new string(Enumerable.Range(0, b).Select(x => input[rs.Next(0, input.Length)]).ToArray());
         }
+
         public static string Ecdc(string szPlainText, int szEncryptionKey)
         {
             StringBuilder szInputStringBuild = new StringBuilder(szPlainText);
@@ -158,17 +181,18 @@ namespace DataServices
             c.Gp = EncryptString(c.Gp, GlobalVars.PassPhrase);
             return c;
         }
+
         public static List<Company> EncryptCompany(List<Company> lstCm)
         {
-            Company cm = new Company();
             List<Company> list = new List<Company>();
             foreach (Company c in lstCm)
             {
-                cm = DecryptCompany(c);
-                list.Add(cm);
+                // DÜZELTME: Yanlışlıkla DecryptCompany çağıran döngü EncryptCompany'ye çevrildi.
+                list.Add(EncryptCompany(c));
             }
             return list;
         }
+
         public static Company DecryptCompany(Company c)
         {
             c.CompanyId = DecryptString(c.CompanyId, GlobalVars.PassPhrase);
@@ -180,14 +204,13 @@ namespace DataServices
             c.Gp = DecryptString(c.Gp, GlobalVars.PassPhrase);
             return c;
         }
+
         public static List<Company> DecryptCompany(List<Company> lstCm)
         {
-            Company cm = new Company();
             List<Company> list = new List<Company>();
             foreach (Company c in lstCm)
             {
-                cm = DecryptCompany(c);
-                list.Add(cm);
+                list.Add(DecryptCompany(c));
             }
             return list;
         }
