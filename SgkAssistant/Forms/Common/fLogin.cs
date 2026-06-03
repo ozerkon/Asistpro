@@ -198,6 +198,12 @@ namespace SgkAssistant.Forms.Sgk
                 if (dayRemain <= 0)
                 {
                     lblMessage.Text = "Üyelik süresi doldu. https://www.sinerjia.net üzerinden sürenizi uzatabilirsiniz";
+                    btnCreateFirstUser.Text = "Lisans Anahtarını Değiştir";
+                    btnCreateFirstUser.Visible = true;
+                    btnCreateFirstUser.Enabled = true;
+                    btnCreateFirstUser.Font = new Font("Segoe UI", 12F);
+                    btnCreateFirstUser.Image = Properties.Resources.key;
+                    btnCfuMode = false;
                     btnLogin.Enabled = false;
                 }
             }

@@ -152,7 +152,7 @@ namespace DataServices
             {
                 List<Sapkt> xx = GetAllPackage(out msg);
                 paket = ConRemote.QueryFirst<Sapkt>("Select * From sapkt where hc = @hc", new { hc = h });
-                string pass = DecPass(xx[5].Pass);
+                //string pass = DecPass(paket.Pass);
                 ConRemote.Close();
                 paket.Pass = DecPass(paket.Pass);
 

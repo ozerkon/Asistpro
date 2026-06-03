@@ -33,7 +33,7 @@
     <TargetCulture>tr-TR</TargetCulture>
     <ProductName>SGK Asistan</ProductName>
     <PublisherName>SinerjiA</PublisherName>
-    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationRevision>2</ApplicationRevision>
     <ApplicationVersion>1.2.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>

@@ -34,14 +34,14 @@
             this.lblMessage = new System.Windows.Forms.Label();
             this.radPanel1 = new Telerik.WinControls.UI.RadPanel();
             this.radPanel2 = new Telerik.WinControls.UI.RadPanel();
+            this.btnRefresh = new Telerik.WinControls.UI.RadButton();
+            this.roundRectShape1 = new Telerik.WinControls.RoundRectShape(this.components);
             this.radLabel1 = new Telerik.WinControls.UI.RadLabel();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.texUname = new Telerik.WinControls.UI.RadTextBoxControl();
             this.texUpass = new Telerik.WinControls.UI.RadTextBoxControl();
             this.btnCancel = new Telerik.WinControls.UI.RadButton();
-            this.roundRectShape1 = new Telerik.WinControls.RoundRectShape(this.components);
-            this.btnRefresh = new Telerik.WinControls.UI.RadButton();
             this.btnCreateFirstUser = new Telerik.WinControls.UI.RadButton();
             this.pictureBox4 = new System.Windows.Forms.PictureBox();
             this.btnLogin = new Telerik.WinControls.UI.RadButton();
@@ -50,11 +50,11 @@
             this.radPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.radPanel2)).BeginInit();
             this.radPanel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.btnRefresh)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.radLabel1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.texUname)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.texUpass)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnCancel)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.btnRefresh)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnCreateFirstUser)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnLogin)).BeginInit();
@@ -111,6 +111,28 @@
             this.radPanel2.TabIndex = 19;
             ((Telerik.WinControls.Primitives.BorderPrimitive)(this.radPanel2.GetChildAt(0).GetChildAt(1))).SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
             ((Telerik.WinControls.Primitives.BorderPrimitive)(this.radPanel2.GetChildAt(0).GetChildAt(1))).Visibility = Telerik.WinControls.ElementVisibility.Collapsed;
+            // 
+            // btnRefresh
+            // 
+            this.btnRefresh.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.btnRefresh.BackColor = System.Drawing.Color.Transparent;
+            this.btnRefresh.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnRefresh.Image = global::SgkAssistant.Properties.Resources.refresh;
+            this.btnRefresh.Location = new System.Drawing.Point(3, 6);
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.btnRefresh.Size = new System.Drawing.Size(94, 24);
+            this.btnRefresh.TabIndex = 5;
+            this.btnRefresh.Text = "Tekrar Dene";
+            this.btnRefresh.TextAlignment = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            ((Telerik.WinControls.UI.RadButtonElement)(this.btnRefresh.GetChildAt(0))).Image = global::SgkAssistant.Properties.Resources.refresh;
+            ((Telerik.WinControls.UI.RadButtonElement)(this.btnRefresh.GetChildAt(0))).TextAlignment = System.Drawing.ContentAlignment.MiddleRight;
+            ((Telerik.WinControls.UI.RadButtonElement)(this.btnRefresh.GetChildAt(0))).Text = "Tekrar Dene";
+            ((Telerik.WinControls.UI.RadButtonElement)(this.btnRefresh.GetChildAt(0))).Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            ((Telerik.WinControls.UI.RadButtonElement)(this.btnRefresh.GetChildAt(0))).Shape = this.roundRectShape1;
+            ((Telerik.WinControls.Primitives.BorderPrimitive)(this.btnRefresh.GetChildAt(0).GetChildAt(2))).ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(148)))), ((int)(((byte)(186)))));
+            ((Telerik.WinControls.Primitives.BorderPrimitive)(this.btnRefresh.GetChildAt(0).GetChildAt(2))).Visibility = Telerik.WinControls.ElementVisibility.Visible;
             // 
             // radLabel1
             // 
@@ -177,7 +199,7 @@
             ((Telerik.WinControls.Primitives.BorderPrimitive)(this.texUname.GetChildAt(0).GetChildAt(3).GetChildAt(5))).BackColor = System.Drawing.Color.Transparent;
             ((Telerik.WinControls.Primitives.BorderPrimitive)(this.texUname.GetChildAt(0).GetChildAt(3).GetChildAt(5))).SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.Default;
             ((Telerik.WinControls.Primitives.BorderPrimitive)(this.texUname.GetChildAt(0).GetChildAt(3).GetChildAt(5))).CanFocus = false;
-            ((Telerik.WinControls.Primitives.BorderPrimitive)(this.texUname.GetChildAt(0).GetChildAt(3).GetChildAt(5))).AngleTransform = -5850F;
+            ((Telerik.WinControls.Primitives.BorderPrimitive)(this.texUname.GetChildAt(0).GetChildAt(3).GetChildAt(5))).AngleTransform = -6030F;
             // 
             // texUpass
             // 
@@ -205,7 +227,7 @@
             ((Telerik.WinControls.UI.RadScrollBarElement)(this.texUpass.GetChildAt(0).GetChildAt(3))).Visibility = Telerik.WinControls.ElementVisibility.Collapsed;
             ((Telerik.WinControls.Primitives.BorderPrimitive)(this.texUpass.GetChildAt(0).GetChildAt(3).GetChildAt(5))).BackColor = System.Drawing.Color.Transparent;
             ((Telerik.WinControls.Primitives.BorderPrimitive)(this.texUpass.GetChildAt(0).GetChildAt(3).GetChildAt(5))).SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.Default;
-            ((Telerik.WinControls.Primitives.BorderPrimitive)(this.texUpass.GetChildAt(0).GetChildAt(3).GetChildAt(5))).AngleTransform = -5760F;
+            ((Telerik.WinControls.Primitives.BorderPrimitive)(this.texUpass.GetChildAt(0).GetChildAt(3).GetChildAt(5))).AngleTransform = -5940F;
             // 
             // btnCancel
             // 
@@ -232,28 +254,6 @@
             ((Telerik.WinControls.UI.RadButtonElement)(this.btnCancel.GetChildAt(0))).Shape = this.roundRectShape1;
             ((Telerik.WinControls.Primitives.BorderPrimitive)(this.btnCancel.GetChildAt(0).GetChildAt(2))).ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(148)))), ((int)(((byte)(186)))));
             ((Telerik.WinControls.Primitives.BorderPrimitive)(this.btnCancel.GetChildAt(0).GetChildAt(2))).Visibility = Telerik.WinControls.ElementVisibility.Visible;
-            // 
-            // btnRefresh
-            // 
-            this.btnRefresh.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.btnRefresh.BackColor = System.Drawing.Color.Transparent;
-            this.btnRefresh.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnRefresh.Image = global::SgkAssistant.Properties.Resources.refresh;
-            this.btnRefresh.Location = new System.Drawing.Point(3, 6);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.btnRefresh.Size = new System.Drawing.Size(94, 24);
-            this.btnRefresh.TabIndex = 5;
-            this.btnRefresh.Text = "Tekrar Dene";
-            this.btnRefresh.TextAlignment = System.Drawing.ContentAlignment.MiddleRight;
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
-            ((Telerik.WinControls.UI.RadButtonElement)(this.btnRefresh.GetChildAt(0))).Image = global::SgkAssistant.Properties.Resources.refresh;
-            ((Telerik.WinControls.UI.RadButtonElement)(this.btnRefresh.GetChildAt(0))).TextAlignment = System.Drawing.ContentAlignment.MiddleRight;
-            ((Telerik.WinControls.UI.RadButtonElement)(this.btnRefresh.GetChildAt(0))).Text = "Tekrar Dene";
-            ((Telerik.WinControls.UI.RadButtonElement)(this.btnRefresh.GetChildAt(0))).Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            ((Telerik.WinControls.UI.RadButtonElement)(this.btnRefresh.GetChildAt(0))).Shape = this.roundRectShape1;
-            ((Telerik.WinControls.Primitives.BorderPrimitive)(this.btnRefresh.GetChildAt(0).GetChildAt(2))).ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(120)))), ((int)(((byte)(148)))), ((int)(((byte)(186)))));
-            ((Telerik.WinControls.Primitives.BorderPrimitive)(this.btnRefresh.GetChildAt(0).GetChildAt(2))).Visibility = Telerik.WinControls.ElementVisibility.Visible;
             // 
             // btnCreateFirstUser
             // 
@@ -357,11 +357,11 @@
             this.radPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.radPanel2)).EndInit();
             this.radPanel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.btnRefresh)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.radLabel1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.texUname)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.texUpass)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnCancel)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.btnRefresh)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnCreateFirstUser)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnLogin)).EndInit();

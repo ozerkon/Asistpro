@@ -260,7 +260,7 @@
             // 
             this.cbEULA.Location = new System.Drawing.Point(5, 256);
             this.cbEULA.Name = "cbEULA";
-            this.cbEULA.Size = new System.Drawing.Size(259, 18);
+            this.cbEULA.Size = new System.Drawing.Size(256, 17);
             this.cbEULA.TabIndex = 21;
             this.cbEULA.Text = "<html> Son Kullanıcı Lisans Anlaşmasını kabul ediyorum.<span style=\"font-size: 12" +
     "pt\"></span></html>";
@@ -368,7 +368,7 @@
             this.texCode6.Location = new System.Drawing.Point(471, 114);
             this.texCode6.MaxLength = 2;
             this.texCode6.Name = "texCode6";
-            this.texCode6.Size = new System.Drawing.Size(40, 31);
+            this.texCode6.Size = new System.Drawing.Size(40, 27);
             this.texCode6.TabIndex = 6;
             this.texCode6.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.texCode6.Enter += new System.EventHandler(this.texCode_Enter);
@@ -383,7 +383,7 @@
             this.texCode5.Location = new System.Drawing.Point(395, 114);
             this.texCode5.MaxLength = 4;
             this.texCode5.Name = "texCode5";
-            this.texCode5.Size = new System.Drawing.Size(70, 31);
+            this.texCode5.Size = new System.Drawing.Size(70, 27);
             this.texCode5.TabIndex = 5;
             this.texCode5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.texCode5.Enter += new System.EventHandler(this.texCode_Enter);
@@ -398,7 +398,7 @@
             this.texCode4.Location = new System.Drawing.Point(319, 114);
             this.texCode4.MaxLength = 4;
             this.texCode4.Name = "texCode4";
-            this.texCode4.Size = new System.Drawing.Size(70, 31);
+            this.texCode4.Size = new System.Drawing.Size(70, 27);
             this.texCode4.TabIndex = 4;
             this.texCode4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.texCode4.Enter += new System.EventHandler(this.texCode_Enter);
@@ -413,7 +413,7 @@
             this.texCode3.Location = new System.Drawing.Point(243, 114);
             this.texCode3.MaxLength = 4;
             this.texCode3.Name = "texCode3";
-            this.texCode3.Size = new System.Drawing.Size(70, 31);
+            this.texCode3.Size = new System.Drawing.Size(70, 27);
             this.texCode3.TabIndex = 3;
             this.texCode3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.texCode3.Enter += new System.EventHandler(this.texCode_Enter);
@@ -428,7 +428,7 @@
             this.texCode2.Location = new System.Drawing.Point(167, 114);
             this.texCode2.MaxLength = 4;
             this.texCode2.Name = "texCode2";
-            this.texCode2.Size = new System.Drawing.Size(70, 31);
+            this.texCode2.Size = new System.Drawing.Size(70, 27);
             this.texCode2.TabIndex = 2;
             this.texCode2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.texCode2.Enter += new System.EventHandler(this.texCode_Enter);
@@ -443,7 +443,7 @@
             this.texCode1.Location = new System.Drawing.Point(91, 114);
             this.texCode1.MaxLength = 4;
             this.texCode1.Name = "texCode1";
-            this.texCode1.Size = new System.Drawing.Size(70, 31);
+            this.texCode1.Size = new System.Drawing.Size(70, 27);
             this.texCode1.TabIndex = 1;
             this.texCode1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.texCode1.Enter += new System.EventHandler(this.texCode_Enter);
@@ -733,7 +733,7 @@
             this.rbMysql.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.rbMysql.Location = new System.Drawing.Point(6, 29);
             this.rbMysql.Name = "rbMysql";
-            this.rbMysql.Size = new System.Drawing.Size(184, 21);
+            this.rbMysql.Size = new System.Drawing.Size(183, 21);
             this.rbMysql.TabIndex = 1;
             this.rbMysql.TabStop = false;
             this.rbMysql.Text = "MySQL veri tabanı kullan";
@@ -745,7 +745,7 @@
             this.rbLitedb.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.rbLitedb.Location = new System.Drawing.Point(6, 4);
             this.rbLitedb.Name = "rbLitedb";
-            this.rbLitedb.Size = new System.Drawing.Size(338, 21);
+            this.rbLitedb.Size = new System.Drawing.Size(337, 21);
             this.rbLitedb.TabIndex = 0;
             this.rbLitedb.Text = "Kurulum gerektirmeyen LiteDB veri tabanı kullan";
             this.rbLitedb.ToggleState = Telerik.WinControls.Enumerations.ToggleState.On;

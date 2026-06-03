@@ -190,9 +190,10 @@ namespace DataServices
         public Users GetUser(int id, out string msg)
         {
             msg = ""; Users u;
+            
             try
             {
-                u = GetAllUsers(out msg).Find(usr => usr.Id == id);
+                u = GetAllUsers(out msg).Find(usr => usr.Id == id); if (u == null) return null;
                 return u;
             }
             catch (System.Exception ex)

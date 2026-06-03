@@ -45,17 +45,17 @@ namespace SgkAssistant.Forms.Common
         }
         private void TempEnc()
         {
-            Settings.Default.mschostR = Encrypt.EncryptString(Settings.Default.mschostR, GlobalVars.PassPhrase);
-            Settings.Default.mscuidR = Encrypt.EncryptString(Settings.Default.mscuidR, GlobalVars.PassPhrase);
-            Settings.Default.mscupR = Encrypt.EncryptString(Settings.Default.mscupR, GlobalVars.PassPhrase);
-            Settings.Default.mscdbR = Encrypt.EncryptString(Settings.Default.mscdbR, GlobalVars.PassPhrase);
-            Settings.Default.mscprtR = Encrypt.EncryptString(Settings.Default.mscprtR, GlobalVars.PassPhrase);
+            Settings.Default.mschostR = Encrypt.DecryptString(Settings.Default.mschostR, GlobalVars.PassPhrase);
+            Settings.Default.mscuidR = Encrypt.DecryptString(Settings.Default.mscuidR, GlobalVars.PassPhrase);
+            Settings.Default.mscupR = Encrypt.DecryptString(Settings.Default.mscupR, GlobalVars.PassPhrase);
+            Settings.Default.mscdbR = Encrypt.DecryptString(Settings.Default.mscdbR, GlobalVars.PassPhrase);
+            Settings.Default.mscprtR = Encrypt.DecryptString(Settings.Default.mscprtR, GlobalVars.PassPhrase);
 
-            Settings.Default.mschostL = Encrypt.EncryptString(Settings.Default.mschostL, GlobalVars.PassPhrase);
-            Settings.Default.mscuidL = Encrypt.EncryptString(Settings.Default.mscuidL, GlobalVars.PassPhrase);
-            Settings.Default.mscupL = Encrypt.EncryptString(Settings.Default.mscupL, GlobalVars.PassPhrase);
-            Settings.Default.mscdbL = Encrypt.EncryptString(Settings.Default.mscdbL, GlobalVars.PassPhrase);
-            Settings.Default.mscprtL = Encrypt.EncryptString(Settings.Default.mscprtL, GlobalVars.PassPhrase);
+            Settings.Default.mschostL = Encrypt.DecryptString(Settings.Default.mschostL, GlobalVars.PassPhrase);
+            Settings.Default.mscuidL = Encrypt.DecryptString(Settings.Default.mscuidL, GlobalVars.PassPhrase);
+            Settings.Default.mscupL = Encrypt.DecryptString(Settings.Default.mscupL, GlobalVars.PassPhrase);
+            Settings.Default.mscdbL = Encrypt.DecryptString(Settings.Default.mscdbL, GlobalVars.PassPhrase);
+            Settings.Default.mscprtL = Encrypt.DecryptString(Settings.Default.mscprtL, GlobalVars.PassPhrase);
 
             Settings.Default.Save();
         }
@@ -104,13 +104,21 @@ namespace SgkAssistant.Forms.Common
             }
             catch (Exception ex)
             {
-                msg = ex.Message.ToString();
+                msg = "Hata: " + ex.Message.ToString();
                 return false;
             }
         }
         private void InitialSettings()
         {
             string msg = "";
+
+            if (Settings.Default.FirstTimeRunningThisVersion)
+            {
+                Settings.Default.Upgrade(); // Eski sürümlerden kalan ayarları güvenle taşır/temizler
+                Settings.Default.FirstTimeRunningThisVersion = false;
+                Settings.Default.Save();
+            }
+
             GlobalVars.DbType = 0;
             GlobalVars.SgscEnc = Settings.Default.sgscEnc;
             GlobalVars.CmpCheck = Settings.Default.cmpCheck;
@@ -118,6 +126,7 @@ namespace SgkAssistant.Forms.Common
             SetPublicHolidays();
             //GlobalVars.ct = NtpClient.GetNetworkTime(out msg);
             GlobalVars.Ct = DateTime.Now; // NtpClient.GetNetworkTime(out msg);
+
             if (GlobalVars.Ct < Settings.Default.lastLoginDate)
             {
                 lblMessage.Visible = true;
@@ -127,16 +136,6 @@ namespace SgkAssistant.Forms.Common
                 btnCancel.Visible = true;
                 return;
             }
-
-            //if (msg.Contains("gereklidir") || GlobalVars.ct == DateTime.MinValue)
-            //{
-            //    lblMessage.Visible = true;
-            //    radWaitingBar1.StopWaiting();
-            //    radWaitingBar1.Visible = false;
-            //    lblMessage.Text = "Lütfen internet bağlantınızı kontrol edip tekrar deneyin";
-            //    btnCancel.Visible = true;
-            //    return;
-            //}
             #region authority
             if (!WinHelpers.IsAdministrator())
             {
@@ -156,24 +155,26 @@ namespace SgkAssistant.Forms.Common
                 else
                 {
                     string discid = WinHelpers.DiskInfo();  // harddisk seri no 
-                    Settings.Default.discid = discid; 
-                    
-                    //TempEnc();
-                    GlobalVars.SetMsqcsRemote(
-                        Encrypt.DecryptString(Settings.Default.mschostR, GlobalVars.PassPhrase),
-                        Encrypt.DecryptString(Settings.Default.mscdbR, GlobalVars.PassPhrase),
-                        Encrypt.DecryptString(Settings.Default.mscuidR, GlobalVars.PassPhrase),
-                        Encrypt.DecryptString(Settings.Default.mscupR, GlobalVars.PassPhrase),
-                        Encrypt.DecryptString(Settings.Default.mscprtR, GlobalVars.PassPhrase)
-                        );
+                    Settings.Default.discid = discid;
 
-                    GlobalVars.SetMsqcsLocal(
-                        Encrypt.DecryptString(Settings.Default.mschostL, GlobalVars.PassPhrase),
-                        Encrypt.DecryptString(Settings.Default.mscdbL, GlobalVars.PassPhrase),
-                        Encrypt.DecryptString(Settings.Default.mscuidL, GlobalVars.PassPhrase),
-                        Encrypt.DecryptString(Settings.Default.mscupL, GlobalVars.PassPhrase),
-                        Encrypt.DecryptString(Settings.Default.mscprtL, GlobalVars.PassPhrase)
-                        );
+                    // Değerleri önce değişkenlere alıp temizleyelim
+                    string hostL = Encrypt.DecryptString(Settings.Default.mschostL.Trim(), GlobalVars.PassPhrase);
+                    string dbL = Encrypt.DecryptString(Settings.Default.mscdbL.Trim(), GlobalVars.PassPhrase);
+                    string uidL = Encrypt.DecryptString(Settings.Default.mscuidL.Trim(), GlobalVars.PassPhrase);
+                    string upL = Encrypt.DecryptString(Settings.Default.mscupL.Trim(), GlobalVars.PassPhrase);
+                    string prtL = Encrypt.DecryptString(Settings.Default.mscprtL.Trim(), GlobalVars.PassPhrase);
+
+                    // Remote ayarları
+                    GlobalVars.SetMsqcsRemote(
+                        Encrypt.DecryptString(Settings.Default.mschostR.Trim(), GlobalVars.PassPhrase),
+                        Encrypt.DecryptString(Settings.Default.mscdbR.Trim(), GlobalVars.PassPhrase),
+                        Encrypt.DecryptString(Settings.Default.mscuidR.Trim(), GlobalVars.PassPhrase),
+                        Encrypt.DecryptString(Settings.Default.mscupR.Trim(), GlobalVars.PassPhrase),
+                        Encrypt.DecryptString(Settings.Default.mscprtR.Trim(), GlobalVars.PassPhrase)
+                    );
+
+                    // Sorun yoksa Local ayarları ata
+                    GlobalVars.SetMsqcsLocal(hostL, dbL, uidL, upL, prtL);
 
                     GlobalVars.SetLiteDbCs(false);
                 }
@@ -802,5 +803,8 @@ namespace SgkAssistant.Forms.Common
                 checkForUpdate.OnCheckForUpdate();
             }
         }
+
+
+       
     }
 }

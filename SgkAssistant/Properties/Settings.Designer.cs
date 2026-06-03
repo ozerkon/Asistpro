@@ -73,7 +73,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        [global::System.Configuration.DefaultSettingValueAttribute("P8IU78ky6kb7vPyXRKvEgQ==")]
         public string mschostL {
             get {
                 return ((string)(this["mschostL"]));
@@ -85,19 +85,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("root")]
-        public string mscuidL {
-            get {
-                return ((string)(this["mscuidL"]));
-            }
-            set {
-                this["mscuidL"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("LxK190510")]
+        [global::System.Configuration.DefaultSettingValueAttribute("I3HC09eFH0jF8KkaDbhLXA==")]
         public string mscupL {
             get {
                 return ((string)(this["mscupL"]));
@@ -109,7 +97,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("asistan")]
+        [global::System.Configuration.DefaultSettingValueAttribute("35f5k7K+lgfPzp0pFOkmHA==")]
         public string mscdbL {
             get {
                 return ((string)(this["mscdbL"]));
@@ -121,7 +109,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3306")]
+        [global::System.Configuration.DefaultSettingValueAttribute("izrolWego1szTT3iQ0OpTA==")]
         public string mscprtL {
             get {
                 return ((string)(this["mscprtL"]));
@@ -145,7 +133,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("mysql-1ad3d050-hulusi.b.aivencloud.com")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Fs9uqLabAznQ/u1+JGS0jj6403I+b7iHpODDfCoaeyRFqqn56coBUTli8oceKpCR")]
         public string mschostR {
             get {
                 return ((string)(this["mschostR"]));
@@ -157,7 +145,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("avnadmin")]
+        [global::System.Configuration.DefaultSettingValueAttribute("dAweIBXZVrFdHXqKtJpHwg==")]
         public string mscuidR {
             get {
                 return ((string)(this["mscuidR"]));
@@ -169,7 +157,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("LxK+190510.")]
+        [global::System.Configuration.DefaultSettingValueAttribute("uSzSpZC3Gpjs1M9bj92gUw==")]
         public string mscupR {
             get {
                 return ((string)(this["mscupR"]));
@@ -181,7 +169,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("defaultdb")]
+        [global::System.Configuration.DefaultSettingValueAttribute("GnPLQA4Zd+jCmxXekZIr8g==")]
         public string mscdbR {
             get {
                 return ((string)(this["mscdbR"]));
@@ -193,7 +181,7 @@ namespace SgkAssistant.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("18266")]
+        [global::System.Configuration.DefaultSettingValueAttribute("IfYcZU3e0MVRXqqPTa4onA==")]
         public string mscprtR {
             get {
                 return ((string)(this["mscprtR"]));
@@ -984,6 +972,18 @@ namespace SgkAssistant.Properties {
             }
             set {
                 this["leavePersonalEvenColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("I3HC09eFH0jF8KkaDbhLXA==")]
+        public string mscuidL {
+            get {
+                return ((string)(this["mscuidL"]));
+            }
+            set {
+                this["mscuidL"] = value;
             }
         }
     }

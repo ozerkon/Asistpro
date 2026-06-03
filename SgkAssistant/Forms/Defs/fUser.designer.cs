@@ -338,7 +338,7 @@
             ((Telerik.WinControls.UI.RadButtonElement)(this.btnExit.GetChildAt(0))).Text = "KAPAT";
             ((Telerik.WinControls.Primitives.BorderPrimitive)(this.btnExit.GetChildAt(0).GetChildAt(2))).Shape = this.roundRectShape1;
             // 
-            // fUser
+            // FUser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

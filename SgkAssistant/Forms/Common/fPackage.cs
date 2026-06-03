@@ -17,7 +17,7 @@ namespace SgkAssistant.Forms.Defs
         bool allowStart = false;
         bool allowAddUser = false;
         bool readyFinish = false;
-
+        string msg ="";
         Users usr = null;
         public FPackage()
         {
@@ -285,9 +285,9 @@ namespace SgkAssistant.Forms.Defs
                 lblLicenceMessage.Visible = true;
             }
         }
-        private int CheckLicense()
+        private int CheckLicense(out string msg)
         {
-            string msg = "";
+            msg = "";
             string hc = $"{texCode1.Text}{texCode2.Text}{texCode3.Text}{texCode4.Text}{texCode5.Text}{texCode6.Text}";
             string e = texEmail.Text.Trim();
             string p = texLicencePass.Text.Trim();
@@ -399,9 +399,8 @@ namespace SgkAssistant.Forms.Defs
                 return 4;
             }
         }
-        private int AddDemoLicence()
+        private int AddDemoLicence(out string msg)
         {
-            string msg = "";
             string hc = "H4BDHK3FHK40HK3DHKA705";
             string sc = PackageHelper.DecryptHc(hc);
             string fd = "";
@@ -773,11 +772,11 @@ namespace SgkAssistant.Forms.Defs
                     int cla = -1;
                     if (cbDemo.Checked)
                     {
-                        cla = AddDemoLicence();
+                        cla = AddDemoLicence(out msg);
                     }
                     else
                     {
-                        cla = CheckLicense();
+                        cla = CheckLicense(out msg);
                     }
                     switch (cla)
                     {
@@ -798,11 +797,11 @@ namespace SgkAssistant.Forms.Defs
                             break;
                         case 4:
                             e.Cancel = true;
-                            lblLicenceMessage.Text = $"Bağlantı hatası, internet bağlantınızı kontrol edip tekrar deneyin.";
+                            lblLicenceMessage.Text = $"Bağlantı hatası, internet bağlantınızı kontrol edin"; Hatalar();
                             break;
                         case 5:
                             e.Cancel = true;
-                            lblLicenceMessage.Text = $"Geçersiz Lisans Anahtarı, bilgilerinizi kontrol edip tekrar deneyin.";
+                            lblLicenceMessage.Text = $"Geçersiz Lisans Anahtarı, bilgilerinizi kontrol edip tekrar deneyin"; Hatalar();
                             break;
                         case 6:
                             e.Cancel = true;
@@ -830,6 +829,12 @@ namespace SgkAssistant.Forms.Defs
                     lblUserMessage.Text = msg;
                 }
             }
+        }
+        private void Hatalar()
+        {
+            
+            DialogResult dr = RadMessageBox.Show($"" +
+                $"Sunucu Adresi: {GlobalVars.GetMsqcsRemote()}", "Hata!", MessageBoxButtons.OK);
         }
         private void radWizard_Previous(object sender, WizardCancelEventArgs e)
         {

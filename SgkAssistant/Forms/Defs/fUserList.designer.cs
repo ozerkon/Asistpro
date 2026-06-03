@@ -244,7 +244,7 @@
             this.cbbCloseMessage.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.cbbCloseMessage.Click += new System.EventHandler(this.cbbCloseMessage_Click);
             // 
-            // fUserList
+            // FUserList
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

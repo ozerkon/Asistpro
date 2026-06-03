@@ -8,10 +8,12 @@ namespace DataServices
 {
     public class DbBaseLiteDb : DbBase
     {
-        public override string RemoteCs { get; set; } = GlobalVars.GetMsqcsRemote();
-        public override string LocalCs { get; set; } = GlobalVars.GetliteDbCs();
+        // Tepedeki "= GlobalVars.GetMsqcsRemote();" kısımlarını kaldırıyoruz!
+        public override string RemoteCs { get; set; }
+        public override string LocalCs { get; set; }
         protected override MySqlConnection ConRemote { get; set; }
         protected LiteDatabase LdbConnect { get; set; }
+
         public ILiteCollection<Links> LinksConnect;
         public ILiteCollection<Users> UsersConnect;
         public ILiteCollection<Personal> PersonalConnect;
@@ -33,18 +35,30 @@ namespace DataServices
 
         public DbBaseLiteDb()
         {
+            // Değerleri tam bu anda, nesne üretilirken güncel statik hafızadan güvenle çekiyoruz.
+            // Eğer config'den gelen gizli karakter riski varsa her ihtimale karşı .Trim() de ekleyebilirsiniz.
+            LocalCs = GlobalVars.GetliteDbCs();
+            RemoteCs = GlobalVars.GetMsqcsRemote();
+
             LdbConnect = new LiteDatabase(LocalCs);
             SetConRemote();
         }
+
         public override void SetConLocal(string con)
         {
+            LocalCs = con;
             LdbConnect = new LiteDatabase(con);
-            
         }
+
         public override void SetConRemote()
         {
-            ConRemote = new MySqlConnection(RemoteCs);
+            // Eğer RemoteCs bir şekilde boş kaldıysa veya null ise nesneyi oluşturup patlatma koruması
+            if (!string.IsNullOrEmpty(RemoteCs))
+            {
+                ConRemote = new MySqlConnection(RemoteCs);
+            }
         }
+
         public override bool TestConnection(string cs)
         {
             string msg = "";
@@ -62,6 +76,7 @@ namespace DataServices
                 return false;
             }
         }
+
         public override bool TruncateTables()
         {
             try
@@ -86,7 +101,7 @@ namespace DataServices
                 LdbConnect.Execute("DROP COLLECTION users");
                 return true;
             }
-            catch 
+            catch
             {
                 return false;
             }
