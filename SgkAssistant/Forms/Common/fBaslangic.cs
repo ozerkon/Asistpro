@@ -1308,57 +1308,93 @@ namespace SgkAssistant.Forms.Common
                 int ayE = ddlHlEndMount.SelectedItem != null ? ((KeyValuePair<string, int>)ddlHlEndMount.SelectedItem.DataBoundItem).Value : DateTime.Now.Month;
                 int gun = DateTime.DaysInMonth(yilE, ayE);
                 CheckUpVars.EndDate = new DateTime(yilE, ayE, gun);
-
-                if (sender == ddlHlStartYear)
+                try
                 {
-                    foreach (RadListDataItem item in ddlHlEndYear.Items)
+                    if (sender == ddlHlStartYear)
                     {
-                        int yilEd = ((KeyValuePair<string, int>)item.DataBoundItem).Value;
-                        if (yilEd < yilS) { item.Enabled = false; }
-                        else if (yilEd > yilS) { item.Enabled = true; }
-                        else { item.Enabled = true; item.Selected = true; }
-                    }
-                }
-                else if (sender == ddlHlStartMount)
-                {
-                    foreach (RadListDataItem item in ddlHlEndMount.Items)
-                    {
-                        int ayEd = ((KeyValuePair<string, int>)item.DataBoundItem).Value;
-                        if (yilS == yilE)
+                        foreach (RadListDataItem item in ddlHlEndYear.Items)
                         {
-                            if (ayEd < ayS) { item.Enabled = false; }
-                            else if (ayEd > ayS) { item.Enabled = true; }
+                            int yilEd = ((KeyValuePair<string, int>)item.DataBoundItem).Value;
+                            if (yilEd < yilS) { item.Enabled = false; }
+                            else if (yilEd > yilS) { item.Enabled = true; }
                             else { item.Enabled = true; item.Selected = true; }
                         }
-                        else
+                    }
+                    else if (sender == ddlHlStartMount)
+                    {
+                        foreach (RadListDataItem item in ddlHlEndMount.Items)
                         {
-                            item.Enabled = true;
+                            int ayEd = ((KeyValuePair<string, int>)item.DataBoundItem).Value;
+                            if (yilS == yilE)
+                            {
+                                if (ayEd < ayS) { item.Enabled = false; }
+                                else if (ayEd > ayS) { item.Enabled = true; }
+                                else { item.Enabled = true; item.Selected = true; }
+                            }
+                            else
+                            {
+                                item.Enabled = true;
+                            }
                         }
                     }
-                }
-                else if (sender == ddlHlEndYear)
-                {
-                    // Bitiş ayını, bitiş yılı mevcut yıl ise mevcut aya göre kısıtla
-                    int currentYear = DateTime.Now.Year;
-                    int currentMonth = DateTime.Now.Month;
-                    foreach (RadListDataItem item in ddlHlEndMount.Items)
+                    else if (sender == ddlHlEndYear)
                     {
-                        int ayEd = ((KeyValuePair<string, int>)item.DataBoundItem).Value;
+                        // Bitiş ayını, bitiş yılı mevcut yıl ise mevcut aya göre kısıtla
+                        int currentYear = DateTime.Now.Year;
+                        int currentMonth = DateTime.Now.Month;
+                        foreach (RadListDataItem item in ddlHlEndMount.Items)
+                        {
+                            int ayEd = ((KeyValuePair<string, int>)item.DataBoundItem).Value;
+                            if (yilE == currentYear)
+                            {
+                                // Bitiş yılı bugünün yılı ise, ay bugünün ayından büyük olamaz
+                                item.Enabled = ayEd <= currentMonth;
+                            }
+                            else
+                            {
+                                item.Enabled = true;
+                            }
+                        }
+                        // Eğer seçili ay geçersiz hale geldiyse, bugünün ayına veya uygun bir aya set et
                         if (yilE == currentYear)
                         {
-                            // Bitiş yılı bugünün yılı ise, ay bugünün ayından büyük olamaz
-                            item.Enabled = ayEd <= currentMonth;
+                            if (ayE > currentMonth)
+                            {
+                                foreach (RadListDataItem item in ddlHlEndMount.Items)
+                                {
+                                    if (((KeyValuePair<string, int>)item.DataBoundItem).Value == currentMonth)
+                                    {
+                                        item.Selected = true;
+                                        break;
+                                    }
+                                }
+                            }
                         }
-                        else
+
+                        // Başlangıç ayı kısıtlamaları (mevcut kod)
+                        foreach (RadListDataItem item in ddlHlEndMount.Items)
                         {
-                            item.Enabled = true;
+                            int ayEd = ((KeyValuePair<string, int>)item.DataBoundItem).Value;
+                            if (yilS == yilE)
+                            {
+                                if (ayEd < ayS) { item.Enabled = false; }
+                                else if (ayEd > ayS) { item.Enabled = true; }
+                                else { item.Enabled = true; item.Selected = true; }
+                            }
+                            else
+                            {
+                                item.Enabled = true;
+                            }
                         }
                     }
-                    // Eğer seçili ay geçersiz hale geldiyse, bugünün ayına veya uygun bir aya set et
-                    if (yilE == currentYear)
+                    else if (sender == ddlHlEndMount)
                     {
-                        if (ayE > currentMonth)
+                        // Bitiş ayının kendi kısıtlaması: bitiş yılı mevcut yıl ise ay mevcut aydan büyük olamaz
+                        int currentYear = DateTime.Now.Year;
+                        int currentMonth = DateTime.Now.Month;
+                        if (yilE == currentYear && ayE > currentMonth)
                         {
+                            // Geçersiz ay seçilmiş, mevcut aya çek
                             foreach (RadListDataItem item in ddlHlEndMount.Items)
                             {
                                 if (((KeyValuePair<string, int>)item.DataBoundItem).Value == currentMonth)
@@ -1367,100 +1403,84 @@ namespace SgkAssistant.Forms.Common
                                     break;
                                 }
                             }
+                            // Recursion'u önlemek için bu noktada return yapılabilir, ancak sonrasında başlangıç kısıtlamaları da gerekli.
+                            // Yeniden seçim event'i tetikleneceğinden, bu metodun tekrar çalışması sorun olmayacaktır.
+                            return;
                         }
-                    }
 
-                    // Başlangıç ayı kısıtlamaları (mevcut kod)
-                    foreach (RadListDataItem item in ddlHlEndMount.Items)
-                    {
-                        int ayEd = ((KeyValuePair<string, int>)item.DataBoundItem).Value;
-                        if (yilS == yilE)
-                        {
-                            if (ayEd < ayS) { item.Enabled = false; }
-                            else if (ayEd > ayS) { item.Enabled = true; }
-                            else { item.Enabled = true; item.Selected = true; }
-                        }
-                        else
-                        {
-                            item.Enabled = true;
-                        }
-                    }
-                }
-                else if (sender == ddlHlEndMount)
-                {
-                    // Bitiş ayının kendi kısıtlaması: bitiş yılı mevcut yıl ise ay mevcut aydan büyük olamaz
-                    int currentYear = DateTime.Now.Year;
-                    int currentMonth = DateTime.Now.Month;
-                    if (yilE == currentYear && ayE > currentMonth)
-                    {
-                        // Geçersiz ay seçilmiş, mevcut aya çek
-                        foreach (RadListDataItem item in ddlHlEndMount.Items)
-                        {
-                            if (((KeyValuePair<string, int>)item.DataBoundItem).Value == currentMonth)
-                            {
-                                item.Selected = true;
-                                break;
-                            }
-                        }
-                        // Recursion'u önlemek için bu noktada return yapılabilir, ancak sonrasında başlangıç kısıtlamaları da gerekli.
-                        // Yeniden seçim event'i tetikleneceğinden, bu metodun tekrar çalışması sorun olmayacaktır.
-                        return;
-                    }
-
-                    // Başlangıç yılı dropdown'ını bitiş yılına göre sınırla
-                    foreach (RadListDataItem item in ddlHlStartYear.Items)
-                    {
-                        int yilItem = ((KeyValuePair<string, int>)item.DataBoundItem).Value;
-                        item.Enabled = yilItem <= yilE;
-                    }
-
-                    // Eğer seçili başlangıç yılı bitiş yılından büyükse, bitiş yılına eşitle
-                    int seciliYil = ((KeyValuePair<string, int>)ddlHlStartYear.SelectedItem.DataBoundItem).Value;
-                    if (seciliYil > yilE)
-                    {
+                        // Başlangıç yılı dropdown'ını bitiş yılına göre sınırla
                         foreach (RadListDataItem item in ddlHlStartYear.Items)
                         {
-                            if (((KeyValuePair<string, int>)item.DataBoundItem).Value == yilE)
-                            {
-                                item.Selected = true;
-                                break;
-                            }
+                            int yilItem = ((KeyValuePair<string, int>)item.DataBoundItem).Value;
+                            item.Enabled = yilItem <= yilE;
                         }
-                        seciliYil = yilE;
-                    }
 
-                    // Başlangıç ayı dropdown'ını düzenle
-                    foreach (RadListDataItem item in ddlHlStartMount.Items)
-                    {
-                        int ayItem = ((KeyValuePair<string, int>)item.DataBoundItem).Value;
-                        if (seciliYil == yilE)
+                        // Eğer seçili başlangıç yılı bitiş yılından büyükse, bitiş yılına eşitle
+                        int seciliYil = ((KeyValuePair<string, int>)ddlHlStartYear.SelectedItem.DataBoundItem).Value;
+                        if (seciliYil > yilE)
                         {
-                            item.Enabled = ayItem <= ayE;
-                        }
-                        else
-                        {
-                            item.Enabled = true;
-                        }
-                    }
-
-                    // Aynı yıl içinde başlangıç ayı bitiş ayından büyükse, bitiş ayına eşitle
-                    if (seciliYil == yilE)
-                    {
-                        int seciliAy = ((KeyValuePair<string, int>)ddlHlStartMount.SelectedItem.DataBoundItem).Value;
-                        if (seciliAy > ayE)
-                        {
-                            foreach (RadListDataItem item in ddlHlStartMount.Items)
+                            foreach (RadListDataItem item in ddlHlStartYear.Items)
                             {
-                                if (((KeyValuePair<string, int>)item.DataBoundItem).Value == ayE)
+                                if (((KeyValuePair<string, int>)item.DataBoundItem).Value == yilE)
                                 {
                                     item.Selected = true;
                                     break;
                                 }
                             }
+                            seciliYil = yilE;
+                        }
+
+                        // Başlangıç ayı dropdown'ını düzenle
+                        foreach (RadListDataItem item in ddlHlStartMount.Items)
+                        {
+                            int ayItem = ((KeyValuePair<string, int>)item.DataBoundItem).Value;
+                            if (seciliYil == yilE)
+                            {
+                                item.Enabled = ayItem <= ayE;
+                            }
+                            else
+                            {
+                                item.Enabled = true;
+                            }
+                        }
+
+                        // Aynı yıl içinde başlangıç ayı bitiş ayından büyükse, bitiş ayına eşitle
+                        if (seciliYil == yilE)
+                        {
+                            int seciliAy = ((KeyValuePair<string, int>)ddlHlStartMount.SelectedItem.DataBoundItem).Value;
+                            if (seciliAy > ayE)
+                            {
+                                foreach (RadListDataItem item in ddlHlStartMount.Items)
+                                {
+                                    if (((KeyValuePair<string, int>)item.DataBoundItem).Value == ayE)
+                                    {
+                                        item.Selected = true;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
+                catch (Exception)
+                {
+                    if(yilS == 0 ) yilS = DateTime.Now.Year;
+                    if(ayS == 0 ) ayS = DateTime.Now.Month;
+                    if(yilE == 0 ) yilE = DateTime.Now.Year;
+                    if(ayE == 0 ) ayE = DateTime.Now.Month;
+                }
             }
+        }
+        private void DdlFill()
+        {
+            int yilS = ddlHlStartYear.SelectedItem != null ? ((KeyValuePair<string, int>)ddlHlStartYear.SelectedItem.DataBoundItem).Value : DateTime.Now.Year;
+            int ayS = ddlHlStartMount.SelectedItem != null ? ((KeyValuePair<string, int>)ddlHlStartMount.SelectedItem.DataBoundItem).Value : DateTime.Now.Month;
+            CheckUpVars.StartDate = new DateTime(yilS, ayS, 1);
+
+            int yilE = ddlHlEndYear.SelectedItem != null ? ((KeyValuePair<string, int>)ddlHlEndYear.SelectedItem.DataBoundItem).Value : DateTime.Now.Year;
+            int ayE = ddlHlEndMount.SelectedItem != null ? ((KeyValuePair<string, int>)ddlHlEndMount.SelectedItem.DataBoundItem).Value : DateTime.Now.Month;
+            int gun = DateTime.DaysInMonth(yilE, ayE);
+            CheckUpVars.EndDate = new DateTime(yilE, ayE, gun);
         }
         #endregion
         #endregion
@@ -3823,7 +3843,7 @@ namespace SgkAssistant.Forms.Common
             if (Surucu.Driver == null || !IOC.LinkOps.IsBrowserOpen())
                 Surucu.Driver = IOC.WinHelpers.GetWebDriver(Settings.Default.hideBrowser, out msg);
 
-            IOC.LinkOps.CmdUrlVurl = LinkGlobals.LstLinks.Where(x => x.Id == 53).Select(x => new CmdUrlVurl { Cmd = x.Cmd, Url = x.Url, Vurl = x.Vurl }).FirstOrDefault();
+            IOC.LinkOps.CmdUrlVurl = LinkGlobals.LstLinks.Where(x => x.Id == 42).Select(x => new CmdUrlVurl { Cmd = x.Cmd, Url = x.Url, Vurl = x.Vurl }).FirstOrDefault();
             IOC.SgkLinksService.Command = IOC.LinkOps.CmdUrlVurl?.Cmd;
             IOC.SgkLinksService.Url = IOC.LinkOps.CmdUrlVurl?.Url;
             IOC.SgkLinksService.Vurl = IOC.LinkOps.CmdUrlVurl?.Vurl;
@@ -3838,9 +3858,9 @@ namespace SgkAssistant.Forms.Common
                 int currentCompanyId = 0;
                 Invoke((Action)(() =>
                 {
-                    if (rgvCompanyList.CurrentRow != null && rgvCompanyList.CurrentRow.Cells[0].Value != null)
+                    if (rgvCompanyList.CurrentRow != null && rgvCompanyList.CurrentRow.Cells[23].Value != null)
                     {
-                        currentCompanyId = Convert.ToInt32(rgvCompanyList.CurrentRow.Cells[0].Value);
+                        currentCompanyId = Convert.ToInt32(rgvCompanyList.CurrentRow.Cells[23].Value);
                     }
                 }));
 
@@ -3893,10 +3913,10 @@ namespace SgkAssistant.Forms.Common
                 // Belleğe aldığımız liste miktarı kadar lastnames şablonu oluşturuluyor
                 for (int idx = 0; idx < tcknList.Count; idx++)
                 {
-                    listeLastNames.Add(new LastNames() { Tcno = "x", Asf = "y", Asl = "z" });
+                    listeLastNames.Add(new LastNames() { Tcno = tcknList[idx], Asf = "y", Asl = "z" });
                 }
 
-                if (msg.Contains("Oturum başlatıldı"))
+                if (msg == "")
                 {
                     // --- BÖLÜM 1: Ad-Soyad Sorgulama Döngüsü ---
                     for (int i = 0; i < tcknList.Count; i++)
@@ -3911,8 +3931,8 @@ namespace SgkAssistant.Forms.Common
                             lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">{currentTc} için İşe Giriş Bildirgesi'nden Ad-Soyad sorgulanıyor</span></strong></li>";
                         }));
 
-                        soyadError = IOC.SgkLinksService.FillTextBox("x", "/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[6]/td/table/tbody/tr/td[4]/nobr/input[1]", "DetailsNameTC.tcno", out msg);
-
+                        soyadError = IOC.SgkLinksService.FillTextBox("i", "tckno", "DetailsNameTC.tcno", out msg);
+                        //
                         if (!soyadError)
                         {
                             Invoke((Action)(() =>
@@ -3922,7 +3942,7 @@ namespace SgkAssistant.Forms.Common
                             return;
                         }
 
-                        IOC.SgkLinksService.Command = "clk t:x tv:/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[6]/td/table/tbody/tr/td[4]/nobr/input[2]\n\rlne\r\nlck Kimlik Numarası :";
+                        IOC.SgkLinksService.Command = "clk t:i tv:button1\n\rlne\r\nlck Kimlik Numarası :";
 
                         if (IOC.SgkLinksService.GoAhead(out msg))
                         {
@@ -4043,9 +4063,10 @@ namespace SgkAssistant.Forms.Common
                             lblReportSoyad.Text += $"<li><strong><span style=\"font-size: 10pt\">{currentTc} için İşe Giriş Bildirgesi'nden Ad-Soyad sorgulanıyor</span></strong></li>";
                         }));
 
-                        IOC.SgkLinksService.FillTextBox("x", "/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[6]/td/table/tbody/tr/td[4]/nobr/input[1]", "DetailsNameTC.tcno", out msg);
-                        IOC.SgkLinksService.Command = "clk t:x tv:/html/body/table[3]/tbody/tr/td/table/tbody/tr[2]/td[2]/table[3]/tbody/tr/td/table/tbody/tr/td/form/table/tbody/tr/td/table/tbody/tr[6]/td/table/tbody/tr/td[4]/nobr/input[2]\n\rlne\n\rlck Kimlik Numarası :";
-
+                        IOC.SgkLinksService.FillTextBox("i", "tckno", "DetailsNameTC.tcno", out msg);
+                        //
+                        IOC.SgkLinksService.Command = "clk t:i tv:button1\n\rlne\n\rlck Kimlik Numarası :";
+             
                         if (IOC.SgkLinksService.GoAhead(out msg))
                         {
                             if (bgwSoyad.CancellationPending) { e.Cancel = true; return; }

@@ -719,7 +719,8 @@ namespace SGKServices
                 return false;
             }
             Message = "Oturum başlatıldı...";
-            LoginBtnClicked=false;
+            msg = "Oturum başlatıldı...";
+            LoginBtnClicked =false;
             return true;
         }
         public bool GoAhead(out string msg)
@@ -745,7 +746,7 @@ namespace SGKServices
                     switch (parts[0])
                     {
                         case "clk":
-                            if (parts[1].Remove(0, 2) == "t")
+                            if (parts[1].Remove(0, 2) != "x")
                             {
                                 Element = GetButtonElementBy(parts[1].Remove(0, 2), line.Remove(0, 11), out msg);
                             }

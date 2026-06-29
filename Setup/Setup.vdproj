@@ -1180,12 +1180,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_6B37F5C289EAF71FF93CC3292F9E967E"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_C28235FEA13C4BF48FEFDE3B45EB4CE2"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1541,6 +1535,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_9EA7E27E082EFFFA38EDF34EB1460708"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_6B37F5C289EAF71FF93CC3292F9E967E"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -3778,15 +3778,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Asistpro"
-        "ProductCode" = "8:{0226876E-5440-4A94-B80F-11FB2D425BDA}"
-        "PackageCode" = "8:{25977AA0-E143-4B27-8EA4-A4A08297BFF3}"
+        "ProductCode" = "8:{578F460B-1F63-4E86-81FD-8CCCD3EDF42E}"
+        "PackageCode" = "8:{6C9680F7-5330-41B2-A2A0-48BD6067A5E3}"
         "UpgradeCode" = "8:{98CE9075-D3DA-4EC1-9645-ABBC441C3B2A}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.2.2"
+        "ProductVersion" = "8:1.2.3"
         "Manufacturer" = "8:SinerjiA"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

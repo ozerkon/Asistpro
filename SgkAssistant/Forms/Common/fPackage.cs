@@ -401,7 +401,7 @@ namespace SgkAssistant.Forms.Defs
         }
         private int AddDemoLicence(out string msg)
         {
-            string hc = "H4BDHK3FHK40HK3DHKA705";
+            string hc = "J909JM76JM11JM4CJM9105";
             string sc = PackageHelper.DecryptHc(hc);
             string fd = "";
             string mac = WinHelpers.GetMacAdress();
@@ -900,11 +900,12 @@ namespace SgkAssistant.Forms.Defs
         {
             if (cbDemo.Checked)
             {
-                texCode1.Text = "H4BD"; texCode1.Enabled = false;
-                texCode2.Text = "HK3F"; texCode2.Enabled = false;
-                texCode3.Text = "HK40"; texCode3.Enabled = false;
-                texCode4.Text = "HK3D"; texCode4.Enabled = false;
-                texCode5.Text = "HKA7"; texCode5.Enabled = false;
+                //J909JM76JM11JM4CJM9105
+                texCode1.Text = "J909"; texCode1.Enabled = false;
+                texCode2.Text = "JM76"; texCode2.Enabled = false;
+                texCode3.Text = "JM11"; texCode3.Enabled = false;
+                texCode4.Text = "JM4C"; texCode4.Enabled = false;
+                texCode5.Text = "JM91"; texCode5.Enabled = false;
                 texCode6.Text = "05";   texCode6.Enabled = false;
                 texEmail.Text = "demo@sgkasistan.com"; texEmail.Enabled = false;
                 texLicencePass.Text = "sinerjia.net"; texLicencePass.Enabled = false;

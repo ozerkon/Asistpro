@@ -2867,7 +2867,7 @@
             // 
             resources.ApplyResources(this.rtHizmetListe, "rtHizmetListe");
             this.rtHizmetListe.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.rtHizmetListe.IsSelected = true;
+            this.rtHizmetListe.IsSelected = false;
             this.rtHizmetListe.Items.AddRange(new Telerik.WinControls.RadItem[] {
             this.radRibbonBarGroup8,
             this.rbgHLPeriods,
@@ -3485,7 +3485,7 @@
             // 
             resources.ApplyResources(this.rtLastName, "rtLastName");
             this.rtLastName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.rtLastName.IsSelected = false;
+            this.rtLastName.IsSelected = true;
             this.rtLastName.Items.AddRange(new Telerik.WinControls.RadItem[] {
             this.rbgKimlikNumara});
             this.rtLastName.Name = "rtLastName";

@@ -201,7 +201,8 @@ namespace SgkAssistant.LinkOperations
                                 lbl.Text = GlobalVars.ProcessReport;
                                 msg = "continueGoAhead";
                                 return;
-                            }else if (msg.Contains("yeniden"))
+                            }
+                            else if (msg.Contains("yeniden"))
                             {
                                 string browser = LinkGlobals.BrowserType == 0 ? "firefox" : "chrome";
                                 GlobalVars.ProcessReport += $"<li><strong><span style=\"font-size: 10pt; color: red\">Oturum açıldıktan sonra sayfa yüklenemedi, {browser} yenileniyor</span></strong></li>";
@@ -210,7 +211,7 @@ namespace SgkAssistant.LinkOperations
                                 if (msg == "tamam") break;
                                 continue;
                             }
-                            //RefreshAfterLogin(out msg); // silmeyi unutma
+                            
                             break;
 
                         }
