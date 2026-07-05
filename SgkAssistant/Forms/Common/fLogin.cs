@@ -165,6 +165,8 @@ namespace SgkAssistant.Forms.Sgk
                     lblMessage.Text = "Demo sürümün süresi doldu";
                     btnCreateFirstUser.Text = "Lisans Anahtarını Değiştir";
                     btnCreateFirstUser.Visible = true;
+                    btnCreateFirstUser.Enabled = true;
+                    btnCreateFirstUser.Font = new Font(FontFamily.GenericSansSerif, 10.0F, FontStyle.Bold);
                     btnCreateFirstUser.Image = Properties.Resources.key;
                     btnCfuMode = false;
                     btnLogin.Enabled = false;

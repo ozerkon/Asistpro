@@ -959,6 +959,12 @@ namespace SgkAssistant.Forms.Common
             {
                 if (e.CellElement.ColumnInfo.Name == "Bt" || e.CellElement.ColumnInfo.Name == "Bm" || e.CellElement.ColumnInfo.Name == "Kn") e.CellElement.Padding = new Padding(20, 0, 0, 0);
                 else if(e.CellElement.ColumnInfo.Name == "Tcs" || e.CellElement.ColumnInfo.Name == "Tgs" || e.CellElement.ColumnInfo.Name == "Tpt") e.CellElement.Padding = new Padding(0, 0, 20, 0);
+
+                if (e.Column.Index == 15 && e.CellElement is GridCommandCellElement cmdCell)
+                {
+                    // Belge Mahiyeti "İPTAL" değerine eşit DEĞİLSE buton aktif (true) olur, eşitse deaktif (false) olur.
+                    cmdCell.CommandButton.Enabled = e.Row.Cells[4].Value?.ToString() != "İPTAL";
+                }
             }
             if (e.CellElement.MasterTemplate.Owner == rgvMossip && modulType == ModulTypeEnum.Hizmet)
             {
@@ -4811,7 +4817,7 @@ namespace SgkAssistant.Forms.Common
                                 {
                                     foreach (SgkHlp h in lstIptal)
                                     {
-                                        lstHlp.RemoveAll(x => x.Ads == h.Ads && x.Bt == h.Bt && x.CGun == h.CGun && x.Cn == h.Cn && x.Cx == h.Cx && x.Egn == h.Egn && x.EGun == h.EGun && x.GGun == h.GGun && x.Gun == h.Gun && x.Icn == h.Icn && x.Itl == h.Itl && x.Kk == h.Kk && x.Mk == h.Mk && x.Tcno == h.Tcno && x.Ucg == h.Ucg && x.Utl == h.Utl && x.Ya == h.Ya && (x.Bm == "ASIL" || x.Bm == "asıl" || x.Bm == "asil"));
+                                        lstHlp.RemoveAll(x => x.Ads == h.Ads && x.Bt == h.Bt && x.CGun == h.CGun && x.Cn == h.Cn && x.Cx == h.Cx && x.Egn == h.Egn && x.EGun == h.EGun && x.GGun == h.GGun && x.Gun == h.Gun && x.Icn == h.Icn && x.Itl == h.Itl && x.Kk == h.Kk && x.Mk == h.Mk && x.Tcno == h.Tcno && x.Ucg == h.Ucg && x.Utl == h.Utl && x.Ya == h.Ya && (x.Bm == "ASIL" || x.Bm == "asıl" || x.Bm == "asil" || x.Bm.ToLower() == "ek"));
                                     }
                                 }
                                 #endregion
@@ -5492,6 +5498,7 @@ namespace SgkAssistant.Forms.Common
                 string bm = rows[rowNo].FindElement(By.XPath($"{pathPrefix}{rowNo + 1}]/td[{colno + 3}]/p")).Text;
                 IWebElement weKn = rows[rowNo].FindElement(By.XPath($"{pathPrefix}{rowNo + 1}]/td[{colno + 4}]/p"));
                 string kn = weKn != null ? weKn.Text : " ";
+                if (kn.Trim() == "") kn = "00000";
                 string tcs = rows[rowNo].FindElement(By.XPath($"{pathPrefix}{rowNo + 1}]/td[{colno + 5}]/p")).Text;
                 string tgs = rows[rowNo].FindElement(By.XPath($"{pathPrefix}{rowNo + 1}]/td[{colno + 6}]/p")).Text;
                 string tpt = rows[rowNo].FindElement(By.XPath($"{pathPrefix}{rowNo + 1}]/td[{colno + 7}]/p")).Text;

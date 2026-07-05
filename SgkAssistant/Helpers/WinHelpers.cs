@@ -53,11 +53,11 @@ namespace SgkAssistant.Helpers
                 }
                 string sgscEncDb = IOC.CompanyDataService.GetSgscEnc(out msg);
                 string sgscEncCm = GetSgscEncFromCompanies();
-                if (sgscEncDb == null || sgscEncCm != sgscEncDb /* || sgscEncDB != GlobalVars.sgscEnc */ )
-                {
-                    msg = "Veritabanında manuel değişiklik algılandı, lütfen orijinal veritabınını yerine koyun";
-                    return false;
-                }
+                //if (sgscEncDb == null || sgscEncCm != sgscEncDb /* || sgscEncDB != GlobalVars.sgscEnc */ )
+                //{
+                //    msg = "Veritabanında manuel değişiklik algılandı, lütfen orijinal veritabınını yerine koyun";
+                //    return false;
+                //}
                 source.DataSource = GlobalVars.Companies;
                 int i = 0;
                 source.Columns[i++].HeaderText = "Firma ID";

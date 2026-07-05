@@ -190,22 +190,30 @@ namespace SgkAssistant.Forms.Defs
 
         private void rgvCompanyList_SelectionChanged(object sender, EventArgs e)
         {
-            int id = Convert.ToInt32(rgvCompanyList.CurrentRow.Cells[0].Value);
-            if (rgvCompanyList.SelectedRows.Count == 1 && id ==1)
+            try
             {
-                btnEdit.Enabled = true;
-                btnDelete.Enabled = false;
+                int id = Convert.ToInt32(rgvCompanyList.CurrentRow.Cells[0].Value);
+                if (rgvCompanyList.SelectedRows.Count == 1 && id == 1)
+                {
+                    btnEdit.Enabled = true;
+                    btnDelete.Enabled = false;
+                }
+                else if (rgvCompanyList.SelectedRows.Count == 1 && id != 1)
+                {
+                    btnDelete.Enabled = true;
+                    btnEdit.Enabled = true;
+                }
+                else
+                {
+                    btnDelete.Enabled = false;
+                    btnEdit.Enabled = false;
+                }
             }
-            else if (rgvCompanyList.SelectedRows.Count == 1 && id != 1)
+            catch (Exception)
             {
-                btnDelete.Enabled = true;
-                btnEdit.Enabled = true;
+                return;
             }
-            else
-            {
-                btnDelete.Enabled = false;
-                btnEdit.Enabled = false;
-            }
+            
         }
 
         private void btnImport_Click(object sender, EventArgs e)

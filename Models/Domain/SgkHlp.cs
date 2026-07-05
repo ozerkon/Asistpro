@@ -55,7 +55,8 @@ namespace Models.Domain
                     string[] parts = line.Split(' ');
                     if (parts[0] == "Yıl") {   donem = DateTime.Parse(parts[4].Replace("/", ".")); continue; }
                     if (parts[0] == "Belge") { belgeCesidi = parts[3].Trim(); continue; }
-                    if (parts[0] == "Mahiyet") { mahiyet = parts[2].Trim(); continue; }
+                    if (parts[0] == "Mahiyet") 
+                    { mahiyet = parts[2].Trim(); continue; }
                     if (parts[0] == "Kanun") { kanunKodu = parts[2].Trim(); break; }
                 }
                 step = 40;

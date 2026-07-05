@@ -165,100 +165,75 @@ namespace SGKServices
             string selector = "";
             string command = "";
 
+            // JS Kodlarını Promise kullanmadan sadece boolean (true/false) dönecek şekilde basitleştiriyoruz.
             switch (t)
             {
-                case "x":
+                case "x": // XPath
                     selector = tv.Replace("'", "\\'");
-                    command = $"function checkIfElemExists(selector) {{" +
-                                    $"return new Promise(resolve => {{" +
-                                        $"var clickButton = document.evaluate (selector, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;" +
-                                            $"if (clickButton == null) {{ window.requestAnimationFrame(() => checkIfElemExists(selector)); }}" +
-                                            $"else {{ return resolve('ready'); }}" +
-                                    $"}})" +
-                               $"}}" +
-                               $"return checkIfElemExists('{selector}');";
+                    command = $"return document.evaluate('{selector}', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue != null;";
                     break;
-                case "i":
+
+                case "i": // ID
                     selector = $"#{tv}";
-                    command = $"function waitForElm(selector) {{" +
-                                    $"return new Promise(resolve => {{" +
-                                        $"if (document.querySelector(selector)) {{" +
-                                            $"return resolve('ready');" +
-                                        $"}}" +
-                                    $"}});" +
-                               $"}}" +
-                               $"return waitForElm('{selector}');";
+                    command = $"return document.querySelector('{selector}') != null;";
                     break;
-                case "cl":
+                case "c":
+                    selector = tv; // Gelen CSS seçiciyi olduğu gibi al
+                    command = $"return document.querySelector('{selector}') != null;";
+                    break;
+
+                case "cl": // Class
                     selector = $".{tv}";
-                    command = $"function waitForElm(selector) {{" +
-                                    $"return new Promise(resolve => {{" +
-                                        $"if (document.querySelector(selector)) {{" +
-                                            $"return resolve('ready');" +
-                                        $"}}" +
-                                    $"}});" +
-                               $"}}" +
-                               $"return waitForElm('{selector}');";
+                    command = $"return document.querySelector('{selector}') != null;";
                     break;
-                case "tn":
+
+                case "tn": // Tag Name
                     selector = tv;
-                    command = $"function waitForElm(selector) {{" +
-                                    $"return new Promise(resolve => {{" +
-                                        $"if (document.querySelector(selector)) {{" +
-                                            $"return resolve('ready');" +
-                                        $"}}" +
-                                    $"}});" +
-                               $"}}" +
-                               $"return waitForElm('{selector}');";
+                    command = $"return document.querySelector('{selector}') != null;";
                     break;
-                case "n":
+
+                case "n": // Name attribute
                     selector = tv;
-                    command = $"function waitForElm(selector) {{" +
-                                    $"return new Promise(resolve => {{" +
-                                        $"if (document.querySelector(selector)) {{" +
-                                            $"return resolve('ready');" +
-                                        $"}}" +
-                                    $"}});" +
-                               $"}}" +
-                               $"return waitForElm('[name=\"{selector}\"]');";
+                    command = $"return document.querySelector('[name=\"{selector}\"]') != null;";
                     break;
-                case "t":
+
+                case "t": // Text
                     selector = tv.Replace("'", "\\'");
-                    command = $"function waitForLinkByText(text) {{" +
-                                    $"return new Promise(resolve => {{" +
-                                        $"const links = document.querySelectorAll('a');" +
-                                        $"for (const link of links) {{" +
-                                            $"if (link.textContent.includes(text)) {{" +
-                                                $"resolve('ready');" +
-                                                $"return;" +
-                                            $"}}" +
-                                        $"}}" +
-                                        $"resolve(null);" +
-                                    $"}});" +
-                               $"}}" +
-                               $"return waitForLinkByText('{selector}');";
+                    // Array.from ile linkleri diziye çevirip '.some' ile text'i içeren var mı kontrol ediyoruz. (true/false döner)
+                    command = $"return Array.from(document.querySelectorAll('a')).some(link => link.textContent.includes('{selector}'));";
                     break;
             }
 
             bool result = false;
-            while (result == false)
+            int tryCount = 0; // Metoda özel değişken olarak tanımlanması daha güvenlidir
+
+            while (result == false && tryCount < 5)
             {
                 if (GlobalVars.CancelProcess || LinkGlobals.LinkCancel) { return false; }
+
                 try
                 {
-                    result = Wait.Until(e => ((IJavaScriptExecutor)Surucu.Driver).ExecuteScript(command).Equals("ready"));
+                    // ExecuteScript artık JavaScript'ten doğrudan boolean (true/false) değer döndürecek.
+                    result = Wait.Until(e => (bool)((IJavaScriptExecutor)Surucu.Driver).ExecuteScript(command));
                 }
-                catch
+                catch (OpenQA.Selenium.WebDriverTimeoutException)
                 {
+                    // Wait.Until zaman aşımına uğrarsa (element bulunamazsa) Timeout fırlatır.
+                    // Sadece bu durumda sayfayı yenileyip tekrar denemeliyiz.
                     Surucu.Driver.Navigate().Refresh();
                     string msg;
                     WaitForPageLoaded(out msg);
                 }
-                tryCount++;
-                if (tryCount >= 5)
+                catch (Exception)
+                {
+                    // Timeout dışında bir hata alırsak (örneğin geçersiz JS syntax) döngüyü kır.
+                    // Aksi takdirde sonsuz sayfa yenileme döngüsüne girer.
                     break;
+                }
+
+                tryCount++;
             }
-            tryCount = 1;
+
             return result;
         }
 
